@@ -44,7 +44,7 @@ public abstract class Phong implements INhapXuat {
         if (giaCoBan >= 0) {
             this.giaCoBan = giaCoBan;
         } else {
-            System.out.println("Gia co ban khong hop le (phai >= 0). Mac dinh gan = 0.");
+            ThongBao.inCanhBao("Gia co ban phai >= 0. Mac dinh gan = 0.");
             this.giaCoBan = 0.0;
         }
     }

@@ -16,11 +16,13 @@ public class PhongVIP extends Phong {
         super();
         this.loaiView = "Thanh pho";
         this.phiDichVuDacBiet = 0.0;
+        // Phong VIP mac dinh co day du tat ca tien nghi cao cap (Tivi, Tu lanh mini bar, Dieu hoa, Binh nong lanh, Wifi)
+        setTienNghi(new TienNghiPhong("TN-VIP", true, true, true, true, true, "Tot"));
     }
 
-    // Constructor tham số cơ bản
+    // Constructor tham số cơ bản không truyền tiện nghi
     public PhongVIP(String maPhong, double giaCoBan, String trangThai, String loaiView, double phiDichVuDacBiet) {
-        super(maPhong, giaCoBan, trangThai, null);
+        super(maPhong, giaCoBan, trangThai, new TienNghiPhong("TN-VIP", true, true, true, true, true, "Tot"));
         this.loaiView = loaiView;
         setPhiDichVuDacBiet(phiDichVuDacBiet);
     }

@@ -12,11 +12,13 @@ public class PhongStandard extends Phong {
     public PhongStandard() {
         super();
         this.coGiuongPhu = false;
+        // Phong Standard mac dinh co: Tivi, Dieu hoa, Binh nong lanh, Wifi (Khong co Tu lanh)
+        setTienNghi(new TienNghiPhong("TN-STD", true, false, true, true, true, "Tot"));
     }
 
-    // Constructor đầy đủ tham số không có tiện nghi
+    // Constructor đầy đủ tham số không truyền tiện nghi
     public PhongStandard(String maPhong, double giaCoBan, String trangThai, boolean coGiuongPhu) {
-        super(maPhong, giaCoBan, trangThai, null);
+        super(maPhong, giaCoBan, trangThai, new TienNghiPhong("TN-STD", true, false, true, true, true, "Tot"));
         this.coGiuongPhu = coGiuongPhu;
     }
 
