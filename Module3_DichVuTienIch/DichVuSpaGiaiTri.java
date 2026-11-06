@@ -1,6 +1,3 @@
-package BT_quanLyKhachSan;
-
-
 
 import java.util.Scanner;
 
