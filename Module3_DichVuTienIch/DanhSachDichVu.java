@@ -1,4 +1,4 @@
-package BT_quanLyKhachSan;
+
 
 
 import java.util.ArrayList;
