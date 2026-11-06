@@ -3,15 +3,11 @@ package BT_quanLyKhachSan;
 
 import java.util.ArrayList;
 
-public class QuanLyDichVu {
+public class DanhSachDichVu {
     private ArrayList<DichVu> dsDichVu = new ArrayList<>();
 
-    public void themDichVu(DichVu dv) {
-        dsDichVu.add(dv);
-        System.out.println("Thêm dịch vụ thành công!");
-    }
-    
-    public QuanLyDichVu() {
+  
+    public DanhSachDichVu() {
         khoiTaoDuLieuMau();
     }
 
@@ -49,25 +45,36 @@ public class QuanLyDichVu {
             return;
         }
         
-        System.out.println("\n============================= MENU DỊCH VỤ KHÁCH SẠN =============================");
-        System.out.println("\n");
-        int stt = 1;
-        for (DichVu dv : dsDichVu) {
-            System.out.print("[" + stt++ + "] ");
-            dv.xuat();
-            System.out.println("\n");
-            System.out.println("----------------------------------------------------------------------------------");
-        }
-    }
-    public DichVu timKiemDichVu(String ma) {
-        for (DichVu dv : dsDichVu) {
-            if (dv.getMaDV().equalsIgnoreCase(ma)) {
-                return dv;
+        System.out.println("\n============================================ DANH SÁCH DỊCH VỤ KHÁCH SẠN ============================================");
+        System.out.printf("%-5s | %-6s | %-25s | %-12s | %-30s\n", "STT", "Mã DV", "Tên Dịch Vụ", "Đơn Giá", "Chi Tiết / Thông Tin");
+        System.out.println("----------------------------------------------------------------------------------------------------------------------");
+        
+        for (int i = 0; i < dsDichVu.size(); i++) {
+            DichVu dv = dsDichVu.get(i);
+            String thongTinChiTiet = "";
+            
+            // Phân loại để lấy thông tin chi tiết tương ứng mà không bị xuống dòng
+            if (dv instanceof DichVuAnUong) {
+                // Do DichVuAnUong đang lưu chung, ta có thể ép kiểu hoặc tuỳ biến
+                thongTinChiTiet = "Ẩm thực (Đồ ăn / Nước uống)";
+            } else if (dv instanceof DichVuSpaGiaiTri) {
+                thongTinChiTiet = "Spa & Giải trí";
+            } else if (dv instanceof DichVuThueXe) {
+                thongTinChiTiet = "Thuê phương tiện";
             }
+            
+            // In gọn gàng trên đúng một dòng duy nhất
+            System.out.printf("%-5s | %-6s | %-25s | %-12.0f | %-30s\n", 
+                    "#" + (i + 1), 
+                    dv.getMaDV(), 
+                    dv.getTenDV(), 
+                    dv.getDonGia(),
+                    dv.getTenDV() // Hoặc hiển thị mô tả ngắn gọn
+            );
         }
-        return null;
+        System.out.println("======================================================================================================================");
     }
-
+    
     public ArrayList<DichVu> getDsDichVu() {
         return dsDichVu;
     }
