@@ -78,4 +78,24 @@ public class DanhSachDichVu {
     public ArrayList<DichVu> getDsDichVu() {
         return dsDichVu;
     }
+
+    public DichVu timKiemTheoMa(String maDV) {
+        if (maDV == null) return null;
+        for (DichVu dv : dsDichVu) {
+            if (dv.getMaDV() != null && dv.getMaDV().equalsIgnoreCase(maDV.trim())) {
+                return dv;
+            }
+        }
+        return null;
+    }
+
+    public DichVu timKiemTheoTen(String tenDV) {
+        if (tenDV == null) return null;
+        for (DichVu dv : dsDichVu) {
+            if (dv.getTenDV() != null && dv.getTenDV().equalsIgnoreCase(tenDV.trim())) {
+                return dv;
+            }
+        }
+        return null;
+    }
 }
