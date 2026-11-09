@@ -103,35 +103,6 @@ public class DanhSachPhong {
             p.xuat();
         }
     }
-
-    public static void main(String[] args) {
-        DanhSachPhong ql = new DanhSachPhong();
-        Scanner sc = new Scanner(System.in);
-        while (true) {
-            System.out.println("\n--- MENU QUAN LY PHONG ---");
-            System.out.println("1. Xem danh sach phong");
-            System.out.println("2. Them phong moi");
-            System.out.println("3. Loc phong con trong");
-            System.out.println("4. Sua thong tin phong");
-            System.out.println("5. Xoa phong");
-            System.out.println("0. Thoat");
-            System.out.print("Chon: ");
-            int c = sc.nextInt();
-            sc.nextLine();
-            if (c == 1)
-                ql.xuatDanhSach();
-            else if (c == 2)
-                ql.themPhong();
-            else if (c == 3)
-                ql.locPhongTrong();
-            else if (c == 4)
-                ql.suaPhong();
-            else if (c == 5)
-                ql.xoaPhong();
-            else if (c == 0)
-                break;
-        }
-    }
-
 }
+
 
