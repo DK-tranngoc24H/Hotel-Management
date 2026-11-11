@@ -34,31 +34,51 @@ public class QuanLyDatPhong {
         // Khách hàng mẫu
         KHACHHANG kh1 = new KHACHHANG("Nguyen Van An", "012345678901", "0901234567", "Ha Noi", "Thuong", null);
         KHACHHANG kh2 = new KHACHHANG("Tran Thi Bich", "079987654321", "0987654321", "TP Ho Chi Minh", "VIP", null);
+        KHACHHANG kh3 = new KHACHHANG("Le Hoang Nam", "048123456789", "0912345678", "Da Nang", "Doanh nghiep", null);
+        KHACHHANG kh4 = new KHACHHANG("Pham Minh Tuan", "036123456789", "0934567890", "Hai Phong", "Thuong", null);
 
         // Phòng mẫu
         PhongStandard p101 = new PhongStandard("P101", 500_000.0, "Da dat", true);
-        PhongVIP p201 = new PhongVIP("P201", 1_200_000.0, "Da dat", "Huong Bien", 200_000.0);
+        PhongVIP p201 = new PhongVIP("P201", 1_200_000.0, "Trong", "Bien", 200_000.0);
+        PhongStandard p102 = new PhongStandard("P102", 550_000.0, "Da dat", false);
+        PhongVIP p202 = new PhongVIP("P202", 1_000_000.0, "Trong", "Thanh pho", 150_000.0);
 
         // Phiếu đặt phòng mẫu
         PhieuDatPhong pdp1 = new PhieuDatPhong("PDP01", "01/12/2026", "02/12/2026", "05/12/2026", kh1, p101);
         PhieuDatPhong pdp2 = new PhieuDatPhong("PDP02", "03/12/2026", "04/12/2026", "08/12/2026", kh2, p201);
+        PhieuDatPhong pdp3 = new PhieuDatPhong("PDP03", "10/12/2026", "11/12/2026", "14/12/2026", kh3, p102);
+        PhieuDatPhong pdp4 = new PhieuDatPhong("PDP04", "15/12/2026", "16/12/2026", "19/12/2026", kh4, p202);
 
         dsPhieu.add(pdp1);
         dsPhieu.add(pdp2);
+        dsPhieu.add(pdp3);
+        dsPhieu.add(pdp4);
 
         // Gắn chi tiết dịch vụ cho phiếu PDP01 (Phở bò + Cà phê)
         ChiTietHoaDon cthd1 = new ChiTietHoaDon(pdp1);
-        cthd1.themDichVu("DA01", 2); // 2 Phở bò
-        cthd1.themDichVu("NU01", 2); // 2 Cà phê sữa
+        cthd1.themDichVu("DA01", 2); // 2 Phở bò đặc biệt
+        cthd1.themDichVu("NU01", 2); // 2 Cà phê sữa đá
         mapChiTietDichVu.put(pdp1.getMaPhieu(), cthd1);
 
-        // Gắn chi tiết dịch vụ cho phiếu PDP02 (Spa + Thuê xe)
+        // Gắn chi tiết dịch vụ cho phiếu PDP02 (Spa + Thuê xe máy)
         ChiTietHoaDon cthd2 = new ChiTietHoaDon(pdp2);
-        cthd2.themDichVu("SG01", 2); // 2 Vé Spa
-        cthd2.themDichVu("TX02", 1); // 1 Ngày thuê xe máy số
+        cthd2.themDichVu("SG01", 2); // 2 Massage body Thụy Điển
+        cthd2.themDichVu("TX02", 1); // 1 Ngày thuê xe máy
         mapChiTietDichVu.put(pdp2.getMaPhieu(), cthd2);
 
-        // Tạo hóa đơn cho PDP01
+        // Gắn chi tiết dịch vụ cho phiếu PDP03 (Cơm tấm + Nước ép cam)
+        ChiTietHoaDon cthd3 = new ChiTietHoaDon(pdp3);
+        cthd3.themDichVu("DA03", 2); // 2 Cơm tấm sườn bì chả
+        cthd3.themDichVu("NU02", 2); // 2 Nước ép cam tươi
+        mapChiTietDichVu.put(pdp3.getMaPhieu(), cthd3);
+
+        // Gắn chi tiết dịch vụ cho phiếu PDP04 (Karaoke + Thuê ô tô tự lái)
+        ChiTietHoaDon cthd4 = new ChiTietHoaDon(pdp4);
+        cthd4.themDichVu("SG03", 2); // 2 Giờ Karaoke VIP
+        cthd4.themDichVu("TX03", 1); // 1 Ngày thuê ô tô 4 chỗ tự lái
+        mapChiTietDichVu.put(pdp4.getMaPhieu(), cthd4);
+
+        // Tạo hóa đơn cho PDP01 (chưa thanh toán)
         HoaDon hd1 = new HoaDon("HD-PDP01", "05/12/2026", pdp1, cthd1, 50_000.0);
         dsHoaDon.add(hd1);
 
@@ -69,6 +89,18 @@ public class QuanLyDatPhong {
             pdp2.getPhong().setTrangThai("Trong");
         }
         dsHoaDon.add(hd2);
+
+        // Tạo hóa đơn cho PDP03 (chưa thanh toán)
+        HoaDon hd3 = new HoaDon("HD-PDP03", "14/12/2026", pdp3, cthd3, 0.0);
+        dsHoaDon.add(hd3);
+
+        // Tạo hóa đơn cho PDP04 đã thanh toán
+        HoaDon hd4 = new HoaDon("HD-PDP04", "19/12/2026", pdp4, cthd4, 150_000.0);
+        hd4.setDaThanhToan(true);
+        if (pdp4.getPhong() != null) {
+            pdp4.getPhong().setTrangThai("Trong");
+        }
+        dsHoaDon.add(hd4);
     }
 
     // ---------------------------------------------------------------

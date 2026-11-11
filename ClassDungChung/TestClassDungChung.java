@@ -12,7 +12,7 @@ import java.util.Scanner;
  * - Tự động (Automated Testing): Giả lập luồng nhập để kiểm tra nhanh mọi hàm và trường hợp lỗi.
  * - Tương tác (Interactive Testing): Menu trực tiếp cho người dùng tự nhập và kiểm chứng.
  */
-public class Main {
+public class TestClassDungChung {
 
     // =========================================================================
     // LỚP MẪU TRIỂN KHAI INhapXuat ĐỂ KIỂM THỬ

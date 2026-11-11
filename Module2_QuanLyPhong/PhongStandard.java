@@ -12,7 +12,8 @@ public class PhongStandard extends Phong {
     public PhongStandard() {
         super();
         this.coGiuongPhu = false;
-        // Phong Standard mac dinh co: Tivi, Dieu hoa, Binh nong lanh, Wifi (Khong co Tu lanh)
+        // Phong Standard mac dinh co: Tivi, Dieu hoa, Binh nong lanh, Wifi (Khong co Tu
+        // lanh)
         setTienNghi(new TienNghiPhong("TN-STD", true, false, true, true, true, "Tot"));
     }
 
@@ -23,7 +24,8 @@ public class PhongStandard extends Phong {
     }
 
     // Constructor đầy đủ tham số kèm tiện nghi
-    public PhongStandard(String maPhong, double giaCoBan, String trangThai, boolean coGiuongPhu, TienNghiPhong tienNghi) {
+    public PhongStandard(String maPhong, double giaCoBan, String trangThai, boolean coGiuongPhu,
+            TienNghiPhong tienNghi) {
         super(maPhong, giaCoBan, trangThai, tienNghi);
         this.coGiuongPhu = coGiuongPhu;
     }
@@ -39,6 +41,11 @@ public class PhongStandard extends Phong {
     @Override
     public double tinhGiaPhong() {
         return getGiaCoBan() + (coGiuongPhu ? PHU_THU_GIUONG_PHU : 0.0);
+    }
+
+    @Override
+    public String toFileString() {
+        return String.format("standard;%s;%.0f;%s;%b", getMaPhong(), getGiaCoBan(), getTrangThai(), coGiuongPhu);
     }
 
     @Override

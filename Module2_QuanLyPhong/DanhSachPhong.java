@@ -9,10 +9,15 @@ public class DanhSachPhong {
 
     public DanhSachPhong() {
         this.sc = new Scanner(System.in);
-        // Nạp sẵn vài phòng để chạy demo ngay
+        // Nạp sẵn dữ liệu mẫu phòng Standard và VIP để sẵn sàng vận hành & kiểm thử
         ds.add(new PhongStandard("P101", 500000.0, "Trong", false));
-        ds.add(new PhongStandard("P102", 500000.0, "Trong", true));
+        ds.add(new PhongStandard("P102", 550000.0, "Trong", true));
+        ds.add(new PhongStandard("P103", 500000.0, "Trong", false));
+        ds.add(new PhongStandard("P104", 600000.0, "Trong", true));
         ds.add(new PhongVIP("P201", 1200000.0, "Trong", "Bien", 200000.0));
+        ds.add(new PhongVIP("P202", 1000000.0, "Trong", "Thanh pho", 150000.0));
+        ds.add(new PhongVIP("P203", 900000.0, "Trong", "San vuon", 100000.0));
+        ds.add(new PhongVIP("P301", 2000000.0, "Trong", "Bien", 500000.0));
     }
 
     public void themPhong() {
@@ -103,6 +108,44 @@ public class DanhSachPhong {
             p.xuat();
         }
     }
+
+    public void ghiFile(String tenFile) {
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(tenFile))) {
+            for (Phong p : ds) {
+                bw.write(p.toFileString());
+                bw.newLine();
+            }
+            System.out.println("da ghi vao file" + tenFile);
+        } catch (IOException e) {
+            System.out.println("Loi ghi file: " + e.getMessage());
+        }
+    }
+
+    public void docFile(String tenFile) {
+        File f = new File(tenFile);
+        if (!f.exists()) {
+            System.out.println("khong tim thay file");
+            return;
+        }
+        ds.clear();
+        try (BufferedReader br = new BufferedReader(new FileReader(f))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                if (line.trim().isEmpty())
+                    continue;
+
+                String[] parts = line.split(";");
+                if (parts[0].equalsIgnoreCase("STANDARD") && parts.length >= 5) {
+                    ds.add(new PhongStandard(parts[1], Double.parseDouble(parts[2]), parts[3],
+                            Boolean.parseBoolean(parts[4])));
+                } else if (parts[0].equalsIgnoreCase("VIP") && parts.length >= 6) {
+                    ds.add(new PhongVIP(parts[1], Double.parseDouble(parts[2]), parts[3], parts[4],
+                            Double.parseDouble(parts[5])));
+                }
+            }
+            System.out.println("da doc");
+        } catch (Exception e) {
+            System.out.println("Loi doc file: " + e.getMessage());
+        }
+    }
 }
-
-

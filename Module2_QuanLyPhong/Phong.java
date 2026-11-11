@@ -70,8 +70,11 @@ public abstract class Phong implements INhapXuat {
         return "trong".equalsIgnoreCase(this.trangThai) || "trống".equalsIgnoreCase(this.trangThai);
     }
 
-    // Phương thức trừu tượng: mỗi loại phòng con sẽ tự định nghĩa cách tính giá riêng
+    // Phương thức trừu tượng: mỗi loại phòng con sẽ tự định nghĩa cách tính giá
+    // riêng
     public abstract double tinhGiaPhong();
+
+    public abstract String toFileString();
 
     @Override
     public void nhap(Scanner sc) {

@@ -1,7 +1,8 @@
 import java.util.Scanner;
 
 /**
- * Lớp tiện ích kiểm tra dữ liệu đầu vào (toàn bộ là static, gọi trực tiếp: KiemTraLoi.xxx).
+ * Lớp tiện ích kiểm tra dữ liệu đầu vào (toàn bộ là static, gọi trực tiếp:
+ * KiemTraLoi.xxx).
  * Phối hợp với ThongBao để in lỗi.
  */
 public class KiemTraLoi {
@@ -119,6 +120,17 @@ public class KiemTraLoi {
                 return "San vuon";
             }
             ThongBao.inLoi(ThongBao.LOI_VIEW);
+        }
+    }
+
+    public static String kiemTtraCCCD(Scanner sc) {
+        while (true) {
+            System.out.print("nhap cccd");
+            String cccd = sc.nextLine().trim();
+            if (cccd.matches("\\d{12}")) {
+                return cccd;
+            }
+            ThongBao.inLoi("CCCD khong hop le! Phai gom dung 12 chu so.");
         }
     }
 }
