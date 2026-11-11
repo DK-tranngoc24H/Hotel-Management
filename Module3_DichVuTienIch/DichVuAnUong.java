@@ -1,12 +1,8 @@
-
-
-
-
-import java.util.Scanner;
+package BT_quanLyKhachSan;
 
 public class DichVuAnUong extends DichVu {
-    private String phanLoai; 
-    private String chiTiet;  
+    private String phanLoai;
+    private String chiTiet;
 
     public DichVuAnUong() {
         super();
@@ -21,11 +17,8 @@ public class DichVuAnUong extends DichVu {
     @Override
     public void nhap() {
         super.nhap();
-        Scanner sc = new Scanner(System.in);
-        System.out.println("Phân loại (Đồ ăn / Nước uống): ");
-        phanLoai = sc.nextLine();
-        System.out.println("Chi tiết (VD: Bữa sáng / Nước ngọt 330ml): ");
-        chiTiet = sc.nextLine();
+        phanLoai = nhapChuoi("Phân loại (VD: Đồ ăn / Nước uống): ");
+        chiTiet = nhapChuoi("Chi tiết (VD: Bữa sáng / Nước ngọt 330ml): ");
     }
 
     @Override
