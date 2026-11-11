@@ -1,7 +1,7 @@
-package BT_quanLyKhachSan;
+
 
 public class DichVuThueXe extends DichVu {
-    private String loaiPhuongTien;   // VD: Xe máy, Ô tô 4 chỗ, Ô tô 7 chỗ, Xe đạp đôi
+    private String loaiPhuongTien;   
     private int soNgayThue;
 
     public DichVuThueXe() {
@@ -14,16 +14,23 @@ public class DichVuThueXe extends DichVu {
         this.soNgayThue = soNgayThue;
     }
 
-    @Override
-    public void nhap() {
-        super.nhap();
-        loaiPhuongTien = nhapChuoi("Nhập phương tiện (VD: Xe máy / Ô tô 4 chỗ / Ô tô 7 chỗ / Xe đạp đôi): ");
-        soNgayThue = nhapSoNguyen("Nhập số ngày thuê (từ 1 đến 365): ", 1, 365);
+    public String getLoaiPhuongTien() {
+        return loaiPhuongTien;
+    }
+
+    public int getSoNgayThue() {
+        return soNgayThue;
     }
 
     @Override
-    public void xuat() {
-        super.xuat();
-        System.out.println(" Phương tiện: " + loaiPhuongTien + " | Số ngày thuê: " + soNgayThue);
+    public void nhap(NhapLieu nl) {
+        super.nhap(nl);
+        loaiPhuongTien = nl.nhapChuoi("Nhập phương tiện (VD: Xe máy / Ô tô 4 chỗ / Ô tô 7 chỗ / Xe đạp đôi): ");
+        soNgayThue = nl.nhapSoNguyen("Nhập số ngày thuê (từ 1 đến 365): ", 1, 365);
+    }
+
+    @Override
+    public String moTaChiTiet() {
+        return loaiPhuongTien + " - " + soNgayThue + " ngày";
     }
 }
