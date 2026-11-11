@@ -1,9 +1,7 @@
-
-
-import java.util.Scanner;
+package BT_quanLyKhachSan;
 
 public class DichVuThueXe extends DichVu {
-    private String loaiPhuongTien; // Xe máy, Ô tô 4 chỗ, Ô tô 7 chỗ, Xe đạp đôi
+    private String loaiPhuongTien;   // VD: Xe máy, Ô tô 4 chỗ, Ô tô 7 chỗ, Xe đạp đôi
     private int soNgayThue;
 
     public DichVuThueXe() {
@@ -19,11 +17,8 @@ public class DichVuThueXe extends DichVu {
     @Override
     public void nhap() {
         super.nhap();
-        Scanner sc = new Scanner(System.in);
-        System.out.println("Nhập phương tiện (Xe máy / Ô tô 4 chỗ / Ô tô 7 chỗ / Xe đạp đôi): ");
-        loaiPhuongTien = sc.nextLine();
-        System.out.println("Nhập số ngày thuê: ");
-        soNgayThue = Integer.parseInt(sc.nextLine());
+        loaiPhuongTien = nhapChuoi("Nhập phương tiện (VD: Xe máy / Ô tô 4 chỗ / Ô tô 7 chỗ / Xe đạp đôi): ");
+        soNgayThue = nhapSoNguyen("Nhập số ngày thuê (từ 1 đến 365): ", 1, 365);
     }
 
     @Override
