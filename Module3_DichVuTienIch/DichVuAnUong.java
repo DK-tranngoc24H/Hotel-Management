@@ -1,4 +1,4 @@
-package BT_quanLyKhachSan;
+
 
 public class DichVuAnUong extends DichVu {
     private String phanLoai;
@@ -14,16 +14,23 @@ public class DichVuAnUong extends DichVu {
         this.chiTiet = chiTiet;
     }
 
-    @Override
-    public void nhap() {
-        super.nhap();
-        phanLoai = nhapChuoi("Phân loại (VD: Đồ ăn / Nước uống): ");
-        chiTiet = nhapChuoi("Chi tiết (VD: Bữa sáng / Nước ngọt 330ml): ");
+    public String getPhanLoai() {
+        return phanLoai;
+    }
+
+    public String getChiTiet() {
+        return chiTiet;
     }
 
     @Override
-    public void xuat() {
-        super.xuat();
-        System.out.println(" Loại: " + phanLoai + " | Chi tiết: " + chiTiet);
+    public void nhap(NhapLieu nl) {
+        super.nhap(nl);
+        phanLoai = nl.nhapChuoi("Phân loại (VD: Đồ ăn / Nước uống): ");
+        chiTiet = nl.nhapChuoi("Chi tiết (VD: Bữa sáng / Nước ngọt 330ml): ");
+    }
+
+    @Override
+    public String moTaChiTiet() {
+        return phanLoai + " - " + chiTiet;
     }
 }
