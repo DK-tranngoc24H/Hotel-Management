@@ -1,4 +1,3 @@
-package BT_quanLyKhachSan;
 
 public class DichVuSpaGiaiTri extends DichVu {
     private String loaiHoatDong;   // VD: Massage, Hồ bơi, Karaoke, Xông hơi
@@ -14,16 +13,23 @@ public class DichVuSpaGiaiTri extends DichVu {
         this.thoiGianSuDung = thoiGianSuDung;
     }
 
-    @Override
-    public void nhap() {
-        super.nhap();
-        loaiHoatDong = nhapChuoi("Nhập hoạt động (VD: Massage / Hồ bơi / Karaoke / Xông hơi): ");
-        thoiGianSuDung = nhapSoNguyen("Nhập thời gian sử dụng (phút, từ 1 đến 600): ", 1, 600);
+    public String getLoaiHoatDong() {
+        return loaiHoatDong;
+    }
+
+    public int getThoiGianSuDung() {
+        return thoiGianSuDung;
     }
 
     @Override
-    public void xuat() {
-        super.xuat();
-        System.out.println(" Hoạt động: " + loaiHoatDong + " | Thời gian: " + thoiGianSuDung + " phút");
+    public void nhap(NhapLieu nl) {
+        super.nhap(nl);
+        loaiHoatDong = nl.nhapChuoi("Nhập hoạt động (VD: Massage / Hồ bơi / Karaoke / Xông hơi): ");
+        thoiGianSuDung = nl.nhapSoNguyen("Nhập thời gian sử dụng (phút, từ 1 đến 600): ", 1, 600);
+    }
+
+    @Override
+    public String moTaChiTiet() {
+        return loaiHoatDong + " - " + thoiGianSuDung + " phút";
     }
 }
