@@ -1,9 +1,8 @@
-
-import java.util.Scanner;
+package BT_quanLyKhachSan;
 
 public class DichVuSpaGiaiTri extends DichVu {
-    private String loaiHoatDong; // Massage, Hồ bơi, Karaoke, Xông hơi
-    private int thoiGianSuDung;  // Tính bằng phút
+    private String loaiHoatDong;   // VD: Massage, Hồ bơi, Karaoke, Xông hơi
+    private int thoiGianSuDung;    // Tính bằng phút
 
     public DichVuSpaGiaiTri() {
         super();
@@ -18,11 +17,8 @@ public class DichVuSpaGiaiTri extends DichVu {
     @Override
     public void nhap() {
         super.nhap();
-        Scanner sc = new Scanner(System.in);
-        System.out.println("Nhập hoạt động (Massage/Hồ bơi/Karaoke/Xông hơi): ");
-        loaiHoatDong = sc.nextLine();
-        System.out.println("Nhập thời gian sử dụng (phút): ");
-        thoiGianSuDung = Integer.parseInt(sc.nextLine());
+        loaiHoatDong = nhapChuoi("Nhập hoạt động (VD: Massage / Hồ bơi / Karaoke / Xông hơi): ");
+        thoiGianSuDung = nhapSoNguyen("Nhập thời gian sử dụng (phút, từ 1 đến 600): ", 1, 600);
     }
 
     @Override
