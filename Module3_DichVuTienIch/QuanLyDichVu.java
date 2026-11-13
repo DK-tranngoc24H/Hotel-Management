@@ -1,64 +1,72 @@
-
-
-import java.util.ArrayList;
+package BT_quanLyKhachSan;
 
 public class QuanLyDichVu {
-    private final ArrayList<DichVu> danhSach = new ArrayList<>();
-    private final NhapLieu nhapLieu;
+    private final DanhSachDichVu dsDV;
+    private final NhapLieu nl;
 
-    public QuanLyDichVu(NhapLieu nhapLieu) {
-        this.nhapLieu = nhapLieu;
+    public QuanLyDichVu(DanhSachDichVu dsDV, NhapLieu nl) {
+        this.dsDV = dsDV;
+        this.nl = nl;
     }
 
-    // 1. Thêm dịch vụ vào danh sách
-    public void them(DichVu dv) {
-        danhSach.add(dv);
-        System.out.println("Đã thêm dịch vụ thành công!");
-    }
-
-    // 2. Hiển thị toàn bộ danh sách dịch vụ
-    public void hienThi() {
-        if (danhSach.isEmpty()) {
-            System.out.println("Danh sách dịch vụ đang trống!");
-            return;
-        }
-        System.out.println("\n--- DANH SÁCH DỊCH VỤ ---");
-        for (DichVu dv : danhSach) {
-            dv.xuat();
-            System.out.println("----------------------------------------");
-        }
-    }
-
-    // 3. Tìm kiếm dịch vụ theo mã (trả về null nếu không thấy)
-    public DichVu timKiem(String maDV) {
-        for (DichVu dv : danhSach) {
-            if (dv.getMaDV().equalsIgnoreCase(maDV)) {
+    // Tìm dịch vụ theo mã (không phân biệt hoa thường), không có thì trả về null
+    public DichVu timTheoMa(String ma) {
+        for (DichVu dv : dsDV.getDs()) {
+            if (dv.getMaDV().equalsIgnoreCase(ma)) {
                 return dv;
             }
         }
         return null;
     }
 
-    // 4. Xóa dịch vụ theo mã
-    public void xoa(String maDV) {
-        DichVu dv = timKiem(maDV);
-        if (dv != null) {
-            danhSach.remove(dv);
-            System.out.println("Đã xóa thành công dịch vụ mã: " + maDV);
+    public void them() {
+        System.out.println("Loại: 1. Ăn uống   2. Spa & Giải trí   3. Thuê xe");
+        int loai = nl.nhapSoNguyen("Chọn loại: ", 1, 3);
+
+        DichVu dv;
+        if (loai == 1) {
+            dv = new DichVuAnUong();
+        } else if (loai == 2) {
+            dv = new DichVuSpaGiaiTri();
         } else {
-            System.out.println("Không tìm thấy mã dịch vụ cần xóa: " + maDV);
+            dv = new DichVuThueXe();
         }
+        dv.nhap(nl);
+
+        if (timTheoMa(dv.getMaDV()) != null) {
+            System.out.println("Mã " + dv.getMaDV() + " đã tồn tại, không thêm được!");
+            return;
+        }
+
+        dsDV.getDs().add(dv);
+        dsDV.ghiFile();
+        System.out.println("Đã thêm và lưu file.");
     }
 
-    // 5. Sửa thông tin dịch vụ theo mã
-    public void sua(String maDV) {
-        DichVu dv = timKiem(maDV);
-        if (dv != null) {
-            System.out.println("Tìm thấy dịch vụ! Nhập lại thông tin mới:");
-            dv.nhap(nhapLieu);
-            System.out.println("Cập nhật thông tin thành công!");
-        } else {
-            System.out.println("Không tìm thấy mã dịch vụ cần sửa: " + maDV);
+    public void sua() {
+        String ma = nl.nhapChuoi("Nhập mã cần sửa: ");
+        DichVu dv = timTheoMa(ma);
+        if (dv == null) {
+            System.out.println("Không tìm thấy mã " + ma);
+            return;
         }
+
+        System.out.println("Nhập lại thông tin mới cho dịch vụ " + ma + ":");
+        dv.nhap(nl);
+        dsDV.ghiFile();
+        System.out.println("Đã sửa và lưu file.");
+    }
+
+    public void xoa() {
+        String ma = nl.nhapChuoi("Nhập mã cần xóa: ");
+        DichVu dv = timTheoMa(ma);
+        if (dv == null) {
+            System.out.println("Không tìm thấy mã " + ma);
+            return;
+        }
+
+        dsDV.getDs().remove(dv);
+        dsDV.ghiFile();
+        System.out.println("Đã xóa và lưu file.");
     }
 }
