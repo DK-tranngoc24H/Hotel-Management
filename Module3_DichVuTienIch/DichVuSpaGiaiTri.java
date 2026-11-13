@@ -1,11 +1,10 @@
+package BT_quanLyKhachSan;
 
 public class DichVuSpaGiaiTri extends DichVu {
-    private String loaiHoatDong;   // VD: Massage, Hồ bơi, Karaoke, Xông hơi
-    private int thoiGianSuDung;    // Tính bằng phút
+    private String loaiHoatDong;   // Massage, Hồ bơi, Karaoke, ...
+    private int thoiGianSuDung;    // phút
 
-    public DichVuSpaGiaiTri() {
-        super();
-    }
+    public DichVuSpaGiaiTri() {}
 
     public DichVuSpaGiaiTri(String maDV, String tenDV, double donGia, String loaiHoatDong, int thoiGianSuDung) {
         super(maDV, tenDV, donGia);
@@ -13,23 +12,20 @@ public class DichVuSpaGiaiTri extends DichVu {
         this.thoiGianSuDung = thoiGianSuDung;
     }
 
-    public String getLoaiHoatDong() {
-        return loaiHoatDong;
-    }
-
-    public int getThoiGianSuDung() {
-        return thoiGianSuDung;
-    }
-
     @Override
     public void nhap(NhapLieu nl) {
         super.nhap(nl);
-        loaiHoatDong = nl.nhapChuoi("Nhập hoạt động (VD: Massage / Hồ bơi / Karaoke / Xông hơi): ");
-        thoiGianSuDung = nl.nhapSoNguyen("Nhập thời gian sử dụng (phút, từ 1 đến 600): ", 1, 600);
+        loaiHoatDong = nl.nhapChuoi("Hoạt động (VD: Massage / Hồ bơi / Karaoke): ");
+        thoiGianSuDung = nl.nhapSoNguyen("Thời gian sử dụng (phút, 1-600): ", 1, 600);
     }
 
     @Override
     public String moTaChiTiet() {
         return loaiHoatDong + " - " + thoiGianSuDung + " phút";
+    }
+
+    @Override
+    public String toFileLine() {
+        return "SpaGiaiTri" + SEP + maDV + SEP + tenDV + SEP + donGia + SEP + loaiHoatDong + SEP + thoiGianSuDung;
     }
 }
