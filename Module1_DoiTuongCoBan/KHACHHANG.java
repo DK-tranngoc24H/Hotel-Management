@@ -2,40 +2,47 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-
-public class KHACHHANG extends NGUOI {
+public class khachHang extends nguoi {
     Scanner sc = new Scanner(System.in);
     protected String loaikhach;
-    protected List<PhieuDatPhong> lichsudatphong = new ArrayList<>();
+    protected List<Datphong> lichsudatphong = new ArrayList<>();
 
-    public KHACHHANG() {
+    public khachHang() {
         super();
         this.loaikhach = "";
     }
 
-    public KHACHHANG(String hoten, String CCCD, String sdt, String diachi, String loaikhach, List<PhieuDatPhong> lichsudatphong) {
+    public khachHang(String hoten, String CCCD, String sdt, String diachi, String loaikhach, List<Datphong> lichsudatphong) {
         super(hoten, CCCD, sdt, diachi);
-        this.loaikhach = loaikhach;
-        this.lichsudatphong = (lichsudatphong != null) ? lichsudatphong : new ArrayList<>();
+        this.loaikhach = "";
+        setLoaikhach(loaikhach);
+        setLichsudatphong(lichsudatphong);
     }
 
+    @Override
     public void nhap() {
         super.nhap();
 
-        System.out.print("Nhap loai khach: ");
-        loaikhach = sc.nextLine();
+        while (true) {
+            loaikhach = KiemTraLoi.nhapChuoiKhongRong(sc, "Nhap loai khach: ");
+            if (!loaikhach.contains(";")) {
+                break;
+            }
+            ThongBao.inLoi("Loai khach khong duoc chua ky tu ';'!");
+        }
 
-        System.out.print("Nhap so luong lich su dat phong: ");
-        int n = Integer.parseInt(sc.nextLine());
+        int n = KiemTraLoi.nhapSoNguyenDuong(sc, "Nhap so luong lich su dat phong: ");
+
         lichsudatphong = new ArrayList<>();
         for (int i = 0; i < n; i++) {
             System.out.println("Nhap thong tin phong thu " + (i + 1) + ":");
-            PhieuDatPhong dp = new PhieuDatPhong();
-            dp.nhap(sc);
+            Datphong dp = new Datphong();
+            dp.nhap();
             lichsudatphong.add(dp);
         }
     }
 
+    @Override
     public void xuat() {
         super.xuat();
         System.out.println("Loai khach: " + loaikhach);
@@ -43,8 +50,8 @@ public class KHACHHANG extends NGUOI {
         if (lichsudatphong == null || lichsudatphong.isEmpty()) {
             System.out.println("  (Chua co lich su dat phong)");
         } else {
-            for (PhieuDatPhong dp : lichsudatphong) {
-                dp.xuat();
+            for (Datphong dp : lichsudatphong) {
+                System.out.println("  " + dp.toString());
             }
         }
     }
@@ -53,22 +60,39 @@ public class KHACHHANG extends NGUOI {
         return loaikhach;
     }
 
-    public List<PhieuDatPhong> getLichsudatphong() {
+    public List<Datphong> getLichsudatphong() {
         return lichsudatphong;
     }
 
     public void setLoaikhach(String loaikhach) {
-        this.loaikhach = loaikhach;
+        if (loaikhach == null || loaikhach.trim().isEmpty()) {
+            ThongBao.inLoi("Loai khach khong duoc de trong!");
+            return;
+        }
+        if (loaikhach.contains(";")) {
+            ThongBao.inLoi("Loai khach khong duoc chua ky tu ';'!");
+            return;
+        }
+        this.loaikhach = loaikhach.trim();
     }
 
-    public void setLichsudatphong(List<PhieuDatPhong> lichsudatphong) {
-        this.lichsudatphong = lichsudatphong;
+    public void setLichsudatphong(List<Datphong> lichsudatphong) {
+        if (lichsudatphong == null) {
+            this.lichsudatphong = new ArrayList<>();
+            return;
+        }
+        List<Datphong> hopLe = new ArrayList<>();
+        for (Datphong dp : lichsudatphong) {
+            if (dp != null) {
+                hopLe.add(dp);
+            }
+        }
+        this.lichsudatphong = hopLe;
     }
-    public static void main(String[]args)
-    {
-        KHACHHANG kh=new KHACHHANG();
+
+    public static void main(String[] args) {
+        khachHang kh = new khachHang();
         kh.nhap();
         kh.xuat();
-        
     }
 }

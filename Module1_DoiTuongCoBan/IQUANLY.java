@@ -1,4 +1,4 @@
-public interface IQUANLY {
+public interface iQuanLy {
     void nhapDanhSach();
     void xuatDanhSach();
     void them1PhanTu();
