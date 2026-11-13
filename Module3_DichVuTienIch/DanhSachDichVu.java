@@ -1,66 +1,133 @@
+package BT_quanLyKhachSan;
 
-
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.List;
 
 public class DanhSachDichVu {
-    private final ArrayList<DichVu> dsDichVu = new ArrayList<>();
+    private static final String TEN_FILE = "dichvu.txt";
 
+    private final ArrayList<DichVu> ds = new ArrayList<>();
+
+    // Khi tạo đối tượng, đọc dữ liệu từ file
     public DanhSachDichVu() {
-        khoiTaoDuLieuMau();
+        docFile();
     }
 
-    private void khoiTaoDuLieuMau() {
-        // Đồ ăn & Nước uống
-        dsDichVu.add(new DichVuAnUong("DA01", "Phở bò đặc biệt", 50000, "Đồ ăn", "Bữa sáng"));
-        dsDichVu.add(new DichVuAnUong("DA02", "Bún Bò", 50000, "Đồ ăn", "Bữa sáng"));
-        dsDichVu.add(new DichVuAnUong("DA03", "Cơm tấm sườn bì chả", 65000, "Đồ ăn", "Bữa trưa/tối"));
-        dsDichVu.add(new DichVuAnUong("DA04", "Cơm gà xối mỡ", 65000, "Đồ ăn", "Bữa trưa/tối"));
-        dsDichVu.add(new DichVuAnUong("DA05", "Lẩu Gà Lá é", 200000, "Đồ ăn", "Bữa trưa/tối"));
-
-        dsDichVu.add(new DichVuAnUong("NU01", "Cà phê sữa đá", 35000, "Đồ uống", "Không cồn - 280ml"));
-        dsDichVu.add(new DichVuAnUong("NU02", "Nước ép cam tươi", 35000, "Đồ uống", "Không cồn - 330ml"));
-        dsDichVu.add(new DichVuAnUong("NU03", "Matcha latte", 35000, "Đồ uống", "Không cồn - 330ml"));
-        dsDichVu.add(new DichVuAnUong("NU04", "Bia Heineken lon", 30000, "Đồ uống", "Có cồn - 330ml"));
-        dsDichVu.add(new DichVuAnUong("NU05", "Rượu gạo", 70000, "Đồ uống", "Có cồn - 200ml"));
-
-        // Spa & Giải trí
-        dsDichVu.add(new DichVuSpaGiaiTri("SG01", "Massage body Thụy Điển", 300000, "Massage", 60));
-        dsDichVu.add(new DichVuSpaGiaiTri("SG02", "Vé vào cổng Hồ bơi vô cực", 100000, "Hồ bơi", 120));
-        dsDichVu.add(new DichVuSpaGiaiTri("SG03", "Phòng hát Karaoke VIP", 250000, "Karaoke", 60));
-        dsDichVu.add(new DichVuSpaGiaiTri("SG04", "Vé tập Gym", 50000, "Phòng Gym", 180));
-
-        // Thuê xe
-        dsDichVu.add(new DichVuThueXe("TX01", "Thuê xe đạp", 50000, "Xe đạp", 1));
-        dsDichVu.add(new DichVuThueXe("TX02", "Thuê xe máy tay ga", 150000, "Xe máy", 1));
-        dsDichVu.add(new DichVuThueXe("TX03", "Thuê ô tô tự lái 4 chỗ", 850000, "Ô tô 4 chỗ", 1));
-        dsDichVu.add(new DichVuThueXe("TX04", "Thuê ô tô 7 chỗ có tài xế", 1500000, "Ô tô 7 chỗ", 1));
+    public ArrayList<DichVu> getDs() {
+        return ds;
     }
 
-    public void hienThiDanhSach() {
-        if (dsDichVu.isEmpty()) {
-            System.out.println("Danh sách dịch vụ đang trống!");
+    // Đọc toàn bộ file, mỗi dòng thành một dịch vụ
+    public void docFile() {
+        ds.clear();
+        if (!Files.exists(Paths.get(TEN_FILE))) {
+            System.out.println("Chưa có file " + TEN_FILE + ", danh sách trống.");
+            return;
+        }
+        try {
+            List<String> cacDong = Files.readAllLines(Paths.get(TEN_FILE), StandardCharsets.UTF_8);
+            for (String dong : cacDong) {
+                try {
+                    DichVu dv = tachDong(dong);
+                    if (dv != null) {
+                        ds.add(dv);
+                    }
+                } catch (Exception e) {
+                    System.out.println("Bỏ qua dòng sai định dạng: " + dong);
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Lỗi khi đọc file: " + e.getMessage());
+        }
+    }
+
+    // Ghi toàn bộ danh sách ra file
+    public void ghiFile() {
+        List<String> cacDong = new ArrayList<>();
+        for (DichVu dv : ds) {
+            cacDong.add(dv.toFileLine());
+        }
+        try {
+            Files.write(Paths.get(TEN_FILE), cacDong, StandardCharsets.UTF_8);
+        } catch (Exception e) {
+            System.out.println("Lỗi khi ghi file: " + e.getMessage());
+        }
+    }
+
+    // Biến một dòng văn bản thành đối tượng dịch vụ đúng loại
+    private DichVu tachDong(String dong) {
+        // Xóa ký tự BOM nếu file được lưu bằng Notepad có BOM
+        dong = dong.replace("\uFEFF", "").trim();
+        if (dong.isEmpty()) {
+            return null;
+        }
+
+        String[] t = dong.split("\\|");
+        switch (t[0]) {
+            case "AnUong":
+                return new DichVuAnUong(t[1], t[2], Double.parseDouble(t[3]), t[4], t[5]);
+            case "SpaGiaiTri":
+                return new DichVuSpaGiaiTri(t[1], t[2], Double.parseDouble(t[3]), t[4], Integer.parseInt(t[5]));
+            case "ThueXe":
+                return new DichVuThueXe(t[1], t[2], Double.parseDouble(t[3]), t[4], Integer.parseInt(t[5]));
+            default:
+                return null;
+        }
+    }
+
+    // In bảng dịch vụ có khung, các cột căn thẳng hàng
+    public void hienThi() {
+        if (ds.isEmpty()) {
+            System.out.println("  Danh sách trống!");
             return;
         }
 
-        System.out.println("\n========================== DANH SÁCH DỊCH VỤ KHÁCH SẠN ==========================");
-        System.out.printf("%-5s | %-6s | %-28s | %-12s | %s%n",
-                "STT", "Mã DV", "Tên Dịch Vụ", "Đơn Giá", "Chi Tiết");
-        System.out.println("-----------------------------------------------------------------------------------------");
-
-        for (int i = 0; i < dsDichVu.size(); i++) {
-            DichVu dv = dsDichVu.get(i);
-            System.out.printf("%-5s | %-6s | %-28s | %-12.0f | %s%n",
-                    "#" + (i + 1),
-                    dv.getMaDV(),
-                    dv.getTenDV(),
-                    dv.getDonGia(),
-                    dv.moTaChiTiet());
+        // Tính độ rộng từng cột theo nội dung dài nhất
+        int wSTT = 3, wMa = 3, wTen = 10, wGia = 8, wChiTiet = 10;
+        for (DichVu dv : ds) {
+            wMa = Math.max(wMa, dv.getMaDV().length());
+            wTen = Math.max(wTen, dv.getTenDV().length());
+            wGia = Math.max(wGia, String.format("%,.0f", dv.getDonGia()).length());
+            wChiTiet = Math.max(wChiTiet, dv.moTaChiTiet().length());
         }
-        System.out.println("=========================================================================================");
+
+        String duong = "+" + "-".repeat(wSTT + 2) + "+" + "-".repeat(wMa + 2) + "+"
+                + "-".repeat(wTen + 2) + "+" + "-".repeat(wGia + 2) + "+"
+                + "-".repeat(wChiTiet + 2) + "+";
+
+        System.out.println();
+        System.out.println("  DANH SÁCH DỊCH VỤ KHÁCH SẠN (" + ds.size() + " dịch vụ)");
+        System.out.println(duong);
+        System.out.println("| " + canGiua("STT", wSTT) + " | " + canGiua("Mã", wMa)
+                + " | " + canGiua("Tên dịch vụ", wTen) + " | "
+                + canGiua("Đơn giá", wGia) + " | " + canGiua("Chi tiết", wChiTiet) + " |");
+        System.out.println(duong);
+
+        for (int i = 0; i < ds.size(); i++) {
+            DichVu dv = ds.get(i);
+            System.out.println("| " + canGiua(String.valueOf(i + 1), wSTT)
+                    + " | " + canGiua(dv.getMaDV(), wMa)
+                    + " | " + canTrai(dv.getTenDV(), wTen)
+                    + " | " + canPhai(String.format("%,.0f", dv.getDonGia()), wGia)
+                    + " | " + canTrai(dv.moTaChiTiet(), wChiTiet) + " |");
+        }
+        System.out.println(duong);
     }
 
-    public ArrayList<DichVu> getDsDichVu() {
-        return dsDichVu;
+    private String canGiua(String s, int w) {
+        int cach = w - s.length();
+        int trai = cach / 2;
+        return " ".repeat(trai) + s + " ".repeat(cach - trai);
+    }
+
+    private String canTrai(String s, int w) {
+        return s + " ".repeat(w - s.length());
+    }
+
+    private String canPhai(String s, int w) {
+        return " ".repeat(w - s.length()) + s;
     }
 }
-
