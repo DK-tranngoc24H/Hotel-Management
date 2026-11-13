@@ -1,0 +1,11 @@
+{
+    "java.project.sourcePaths": [
+        "ClassDungChung",
+        "Module1_DoiTuongCoBan",
+        "Module2_QuanLyPhong",
+        "Module3_DichVuTienIch",
+        "Module4_QuanLyDatPhong",
+        "Module5_Menu"
+    ]
+}
+
