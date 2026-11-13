@@ -1,151 +1,227 @@
-import java.io.*;
-import java.nio.charset.*;
-import java.nio.file.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Scanner;
 
 public class DanhSachPhong {
-    private final ArrayList<Phong> ds = new ArrayList<>();
+    private static final int KICH_THUOC_MAC_DINH = 100;
+
+    private Phong[] ds;
+    private int soLuong;
     private final Scanner sc;
 
     public DanhSachPhong() {
-        this.sc = new Scanner(System.in);
-        // Nạp sẵn dữ liệu mẫu phòng Standard và VIP để sẵn sàng vận hành & kiểm thử
-        ds.add(new PhongStandard("P101", 500000.0, "Trong", false));
-        ds.add(new PhongStandard("P102", 550000.0, "Trong", true));
-        ds.add(new PhongStandard("P103", 500000.0, "Trong", false));
-        ds.add(new PhongStandard("P104", 600000.0, "Trong", true));
-        ds.add(new PhongVIP("P201", 1200000.0, "Trong", "Bien", 200000.0));
-        ds.add(new PhongVIP("P202", 1000000.0, "Trong", "Thanh pho", 150000.0));
-        ds.add(new PhongVIP("P203", 900000.0, "Trong", "San vuon", 100000.0));
-        ds.add(new PhongVIP("P301", 2000000.0, "Trong", "Bien", 500000.0));
+        this(new Scanner(System.in));
     }
 
-    public void themPhong() {
-        System.out.println("chon loai phong can them(1/phtandard\n2/phongVip\n)\n");
-        int loai = 0;
-        loai = sc.nextInt();
-        sc.nextLine();
-        Phong pmoi;
-        if (loai == 1) {
-            pmoi = new PhongStandard();
-        } else {
-            pmoi = new PhongVIP();
-        }
-        pmoi.nhap(sc);
-        if (timKiemTheoMaPhong(pmoi.getMaPhong()) != null) {
-            System.out.println("da ton tai");
-            return;
-        }
-        ds.add(pmoi);
-        System.out.println("them phong moi thanh cong");
+    public DanhSachPhong(Scanner sc) {
+        this.sc = (sc != null) ? sc : new Scanner(System.in);
+        this.ds = new Phong[KICH_THUOC_MAC_DINH];
+        this.soLuong = 0;
+        docFileMacDinh();
     }
 
-    public void xoaPhong() {
-        System.out.println("chon loai phong ma xoa ");
-        String ma = sc.nextLine();
-        Phong p = timKiemTheoMaPhong(ma);
-        if (p == null) {
-            System.out.println("khong tim thay phong:");
-            return;
+    private void docFileMacDinh() {
+        String[] duongDan = { "Module2_QuanLyPhong/phong.text", "phong.text" };
+        for (String path : duongDan) {
+            if (new File(path).exists()) {
+                docFile(path);
+                return;
+            }
         }
-        if (!p.conTrong()) {
-            System.out.println("phong dang co nguoi thue:");
-            return;
-        }
-        ds.remove(p);
-        System.out.println("da xoa phong");
     }
 
-    public void suaPhong() {
-        System.out.print("Nhap ma phong can sua: ");
-        String ma = sc.nextLine();
-        Phong p = timKiemTheoMaPhong(ma);
-        if (p == null) {
-            System.out.println("Khong tim thay phong voi ma: " + ma);
-            return;
+    private void moRongMangNeuDay() {
+        if (soLuong >= ds.length) {
+            int kichThuocMoi = (ds.length == 0) ? KICH_THUOC_MAC_DINH : ds.length * 2;
+            ds = Arrays.copyOf(ds, kichThuocMoi);
         }
-        System.out.println("Tim thay phong! Nhap lai thong tin moi:");
-        p.nhap(sc);
-        System.out.println(">> Cap nhat thong tin phong thanh cong!");
     }
 
-    public ArrayList<Phong> getDanhSach() {
-        return ds;
+    private boolean them(Phong p) {
+        if (p == null || timViTriTheoMa(p.getMaPhong()) != -1) {
+            return false;
+        }
+        moRongMangNeuDay();
+        ds[soLuong++] = p;
+        return true;
+    }
+
+    private int timViTriTheoMa(String ma) {
+        if (ma == null || ma.trim().isEmpty()) {
+            return -1;
+        }
+        String maCanTim = ma.trim();
+        for (int i = 0; i < soLuong; i++) {
+            if (ds[i] != null && ds[i].getMaPhong().equalsIgnoreCase(maCanTim)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    public int getSoLuong() {
+        return soLuong;
+    }
+
+    public Phong[] getDanhSach() {
+        return Arrays.copyOf(ds, soLuong);
     }
 
     public Phong timKiemTheoMaPhong(String ma) {
-        if (ma == null)
-            return null;
-        for (Phong p : ds) {
-            if (p.getMaPhong().equalsIgnoreCase(ma.trim()))
-                return p;
+        int viTri = timViTriTheoMa(ma);
+        return (viTri != -1) ? ds[viTri] : null;
+    }
+
+    public void themPhong() {
+        int loai = KiemTraLoi.nhapSoNguyenTrongKhoang(sc, "Chon loai phong can them (1. Standard | 2. VIP): ", 1, 2);
+        Phong phongMoi = (loai == 1) ? new PhongStandard() : new PhongVIP();
+        phongMoi.nhap(sc);
+
+        if (!them(phongMoi)) {
+            ThongBao.inLoi("Ma phong '" + phongMoi.getMaPhong() + "' da ton tai!");
+            return;
         }
-        return null;
+
+        ThongBao.inThanhCong("Them phong moi thanh cong!");
+    }
+
+    public void xoaPhong() {
+        if (soLuong == 0) {
+            ThongBao.inCanhBao("Danh sach phong dang trong!");
+            return;
+        }
+
+        String ma = KiemTraLoi.nhapChuoiKhongRong(sc, "Nhap ma phong can xoa: ");
+        int viTri = timViTriTheoMa(ma);
+        if (viTri == -1) {
+            ThongBao.inLoi("Khong tim thay phong voi ma: " + ma);
+            return;
+        }
+        if (!ds[viTri].conTrong()) {
+            ThongBao.inCanhBao("Phong dang co nguoi thue hoac da duoc dat, khong the xoa!");
+            return;
+        }
+
+        for (int i = viTri; i < soLuong - 1; i++) {
+            ds[i] = ds[i + 1];
+        }
+        ds[--soLuong] = null;
+        ThongBao.inThanhCong("Da xoa phong '" + ma.trim() + "' thanh cong!");
+    }
+
+    public void suaPhong() {
+        if (soLuong == 0) {
+            ThongBao.inCanhBao("Danh sach phong dang trong!");
+            return;
+        }
+
+        String ma = KiemTraLoi.nhapChuoiKhongRong(sc, "Nhap ma phong can sua: ");
+        int viTri = timViTriTheoMa(ma);
+        if (viTri == -1) {
+            ThongBao.inLoi("Khong tim thay phong voi ma: " + ma);
+            return;
+        }
+
+        Phong p = ds[viTri];
+        String maCu = p.getMaPhong();
+        System.out.println("Tim thay phong! Nhap lai thong tin moi:");
+        p.nhap(sc);
+
+        // Tranh trung ma phong voi phong khac trong danh sach
+        if (!p.getMaPhong().equalsIgnoreCase(maCu)) {
+            for (int i = 0; i < soLuong; i++) {
+                if (i != viTri && ds[i].getMaPhong().equalsIgnoreCase(p.getMaPhong().trim())) {
+                    ThongBao.inCanhBao("Ma phong moi bi trung voi phong khac! Giu nguyen ma cu: " + maCu);
+                    p.setMaPhong(maCu);
+                    break;
+                }
+            }
+        }
+        ThongBao.inThanhCong("Cap nhat thong tin phong thanh cong!");
     }
 
     public int locPhongTrong() {
         int dem = 0;
-        System.out.println("danh sach phong con trong");
-        for (Phong p : ds) {
-            if (p.conTrong()) {
-                p.xuat();
-                System.out.println();
+        ThongBao.inTieuDe("DANH SACH PHONG CON TRONG");
+        for (int i = 0; i < soLuong; i++) {
+            if (ds[i].conTrong()) {
+                ds[i].xuat();
+                System.out.println("----------------------------------------");
                 dem++;
             }
         }
         if (dem == 0) {
-            System.out.println("Hien tai da het phong trong!");
+            ThongBao.inCanhBao("Hien tai da het phong trong!");
         }
         return dem;
     }
 
     public void xuatDanhSach() {
-        if (ds.isEmpty()) {
-            System.out.println("danh sach phong trong");
+        if (soLuong == 0) {
+            ThongBao.inCanhBao("Danh sach phong dang trong!");
             return;
         }
-        for (Phong p : ds) {
-            p.xuat();
+        ThongBao.inTieuDe("DANH SACH PHONG (" + soLuong + " phong)");
+        for (int i = 0; i < soLuong; i++) {
+            ds[i].xuat();
+            System.out.println("----------------------------------------");
         }
     }
 
     public void ghiFile(String tenFile) {
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(tenFile))) {
-            for (Phong p : ds) {
-                bw.write(p.toFileString());
+            for (int i = 0; i < soLuong; i++) {
+                bw.write(ds[i].toFileString());
                 bw.newLine();
             }
-            System.out.println("da ghi vao file" + tenFile);
+            ThongBao.inThanhCong("Da ghi danh sach phong vao file: " + tenFile);
         } catch (IOException e) {
-            System.out.println("Loi ghi file: " + e.getMessage());
+            ThongBao.inLoi("Loi ghi file: " + e.getMessage());
         }
     }
 
     public void docFile(String tenFile) {
         File f = new File(tenFile);
         if (!f.exists()) {
-            System.out.println("khong tim thay file");
+            ThongBao.inLoi("Khong tim thay file: " + tenFile);
             return;
         }
-        ds.clear();
+
+        Arrays.fill(ds, null);
+        soLuong = 0;
+
         try (BufferedReader br = new BufferedReader(new FileReader(f))) {
             String line;
             while ((line = br.readLine()) != null) {
-                if (line.trim().isEmpty())
+                if (line.trim().isEmpty()) {
                     continue;
+                }
 
                 String[] parts = line.split(";");
-                if (parts[0].equalsIgnoreCase("STANDARD") && parts.length >= 5) {
-                    ds.add(new PhongStandard(parts[1], Double.parseDouble(parts[2]), parts[3],
-                            Boolean.parseBoolean(parts[4])));
-                } else if (parts[0].equalsIgnoreCase("VIP") && parts.length >= 6) {
-                    ds.add(new PhongVIP(parts[1], Double.parseDouble(parts[2]), parts[3], parts[4],
-                            Double.parseDouble(parts[5])));
+                String loai = parts[0].trim();
+                if (loai.equalsIgnoreCase("STANDARD") && parts.length >= 5) {
+                    them(new PhongStandard(
+                            parts[1].trim(),
+                            Double.parseDouble(parts[2].trim()),
+                            parts[3].trim(),
+                            Boolean.parseBoolean(parts[4].trim())));
+                } else if (loai.equalsIgnoreCase("VIP") && parts.length >= 6) {
+                    them(new PhongVIP(
+                            parts[1].trim(),
+                            Double.parseDouble(parts[2].trim()),
+                            parts[3].trim(),
+                            parts[4].trim(),
+                            Double.parseDouble(parts[5].trim())));
                 }
             }
-            System.out.println("da doc");
+            ThongBao.inThanhCong("Da doc " + soLuong + " phong tu file: " + tenFile);
         } catch (Exception e) {
-            System.out.println("Loi doc file: " + e.getMessage());
+            ThongBao.inLoi("Loi doc file: " + e.getMessage());
         }
     }
 }
