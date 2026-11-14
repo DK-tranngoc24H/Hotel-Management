@@ -1,0 +1,19 @@
+AnUong|DA01|Phở bò đặc biệt|50000.0|Đồ ăn|Bữa sáng
+AnUong|DA02|Bún Bò|50000.0|Đồ ăn|Bữa sáng
+AnUong|DA03|Cơm tấm sườn bì chả|65000.0|Đồ ăn|Bữa trưa/tối
+AnUong|DA04|Cơm gà xối mỡ|65000.0|Đồ ăn|Bữa trưa/tối
+AnUong|DA05|Lẩu Gà Lá é|200000.0|Đồ ăn|Bữa trưa/tối
+AnUong|NU01|Cà phê sữa đá|35000.0|Đồ uống|Không cồn - 280ml
+AnUong|NU02|Nước ép cam tươi|35000.0|Đồ uống|Không cồn - 330ml
+AnUong|NU03|Matcha latte|35000.0|Đồ uống|Không cồn - 330ml
+AnUong|NU04|Bia Heineken lon|30000.0|Đồ uống|Có cồn - 330ml
+AnUong|NU05|Rượu gạo|70000.0|Đồ uống|Có cồn - 200ml
+SpaGiaiTri|SG01|Massage body Thụy Điển|300000.0|Massage|60
+SpaGiaiTri|SG02|Vé vào cổng Hồ bơi vô cực|100000.0|Hồ bơi|120
+SpaGiaiTri|SG03|Phòng hát Karaoke VIP|250000.0|Karaoke|60
+SpaGiaiTri|SG04|Vé tập Gym|50000.0|Phòng Gym|180
+ThueXe|TX01|Thuê xe đạp|50000.0|Xe đạp|1
+ThueXe|TX02|Thuê xe máy tay ga|150000.0|Xe máy|1
+ThueXe|TX03|Thuê ô tô tự lái 4 chỗ|850000.0|Ô tô 4 chỗ|1
+ThueXe|TX04|Thuê ô tô 7 chỗ có tài xế|1500000.0|Ô tô 7 chỗ|1
+
