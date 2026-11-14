@@ -4,12 +4,11 @@ import BT_quanLyKhachSan.DichVu;
 
 /**
  * Lớp HoaDon – tính toán và hiển thị hóa đơn thanh toán toàn diện của khách hàng.
- * Đã đồng bộ tên class và tên biến với Module 1 (KhachHang), Module 2 (Phong, PhongStandard, PhongVIP),
- * Module 3 (DichVu) và sử dụng LocalDate cùng Module4_Exception.
+ * Đã bỏ hoàn toàn hằng số giá phòng thường ví dụ (500.000 VNĐ) và lấy trực tiếp
+ * đơn giá phòng từ đối tượng Phong của Module 2 (phong.tinhGiaPhong()).
  */
 public class HoaDon implements INhapXuat {
 
-    public static final double DON_GIA_PHONG_THUONG = 500_000.0;
     public static final double THUE_SUAT = 0.10; // 10% thuế VAT
 
     private String maHoaDon;
@@ -97,8 +96,11 @@ public class HoaDon implements INhapXuat {
         return (phieu != null) ? phieu.tinhSoNgayLuuTru() : 1;
     }
 
+    /**
+     * Lấy đơn giá phòng 1 đêm trực tiếp từ đối tượng Phong của Module 2 (phong.tinhGiaPhong()).
+     */
     public double tinhDonGiaPhong() {
-        return (phieu != null) ? phieu.getGiaPhongMotDem() : DON_GIA_PHONG_THUONG;
+        return (phieu != null) ? phieu.getGiaPhongMotDem() : 0.0;
     }
 
     public double tinhTienPhong() {
@@ -250,26 +252,41 @@ public class HoaDon implements INhapXuat {
             System.out.println("  (Chua co thong tin khach hang)");
         }
 
-        System.out.println("\n[2] CHI TIET TIEN PHONG (PhieuDatPhong):");
+        System.out.println("
+[2] CHI TIET TIEN PHONG (Theo bang gia Module 2):");
         if (phieu != null) {
-            String tenLoaiPhong = "Phong Standard";
-            if (phieu.getPhong() instanceof PhongVIP) {
-                tenLoaiPhong = "Phong VIP (" + ((PhongVIP) phieu.getPhong()).getLoaiView() + ")";
+            Phong phong = phieu.getPhong();
+            System.out.printf("  - Ma phong          : %s%n", phieu.getMaPhong());
+
+            if (phong instanceof PhongVIP) {
+                PhongVIP vip = (PhongVIP) phong;
+                System.out.printf("  - Loai phong        : Phong VIP (View: %s)%n", vip.getLoaiView());
+                System.out.printf("  - Gia co ban (M2)   : %,.0f VND/dem%n", vip.getGiaCoBan());
+                System.out.printf("  - Phu thu View      : %,.0f VND/dem%n", vip.tinhPhuThuView());
+                System.out.printf("  - Phi DV dac biet   : %,.0f VND/dem%n", vip.getPhiDichVuDacBiet());
+            } else if (phong instanceof PhongStandard) {
+                PhongStandard std = (PhongStandard) phong;
+                double phuThuGiuong = std.isCoGiuongPhu() ? 100_000.0 : 0.0;
+                System.out.printf("  - Loai phong        : Phong Standard (Giuong phu: %s)%n",
+                        (std.isCoGiuongPhu() ? "Co" : "Khong"));
+                System.out.printf("  - Gia co ban (M2)   : %,.0f VND/dem%n", std.getGiaCoBan());
+                System.out.printf("  - Phu thu giuong phu: %,.0f VND/dem%n", phuThuGiuong);
+            } else {
+                System.out.println("  - Loai phong        : Phong tieu chuan");
             }
 
-            System.out.printf("  - Ma phong          : %s%n", phieu.getMaPhong());
-            System.out.printf("  - Loai phong        : %s%n", tenLoaiPhong);
+            System.out.printf("  - Don gia/dem (M2)  : %,.0f VND/dem%n", donGiaPhong);
             System.out.printf("  - Ngay nhan phong   : %s%n", phieu.getNgayNhanStr());
             System.out.printf("  - Ngay tra phong    : %s%n", phieu.getNgayTraStr());
             System.out.printf("  - So dem luu tru    : %d dem%n", soNgayLuuTru);
-            System.out.printf("  - Don gia phong/dem : %,.0f VND%n", donGiaPhong);
             System.out.printf("  ==> TIEN PHONG      : %,.0f VND x %d dem = %,.0f VND%n",
                     donGiaPhong, soNgayLuuTru, tienPhong);
         } else {
             System.out.printf("  - Tien phong        : %,.0f VND%n", tienPhong);
         }
 
-        System.out.println("\n[3] CHI TIET DICH VU PHU TRO (ChiTietHoaDon):");
+        System.out.println("
+[3] CHI TIET DICH VU PHU TRO (ChiTietHoaDon):");
         if (chiTiet != null && chiTiet.getSoLuongDichVu() > 0) {
             System.out.println("  ------------------------------------------------------------------------------------------------");
             System.out.printf("  | %-6s | %-26s | %-16s | %-12s | %-8s | %-15s |%n",
@@ -289,7 +306,8 @@ public class HoaDon implements INhapXuat {
             System.out.println("  (Khach hang khong su dung dich vu phu tro: 0 VND)");
         }
 
-        System.out.println("\n[4] TONG HOP THANH TOAN:");
+        System.out.println("
+[4] TONG HOP THANH TOAN:");
         System.out.println("==================================================================================================");
         System.out.printf("  1. Tien phong                    : %,15.0f VND%n", tienPhong);
         System.out.printf("  2. Tien dich vu phu thu          : %,15.0f VND%n", tienDichVu);

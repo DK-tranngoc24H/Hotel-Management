@@ -107,9 +107,4 @@ public class NhanVien extends Nguoi {
         this.luong = luong;
     }
 
-    public static void main(String[] args) {
-        NhanVien nv = new NhanVien();
-        nv.nhap();
-        nv.xuat();
-    }
 }

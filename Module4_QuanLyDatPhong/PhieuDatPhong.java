@@ -7,9 +7,8 @@ import java.util.Scanner;
 
 /**
  * Lớp PhieuDatPhong – quản lý thông tin đặt phòng của khách hàng.
- * Đã đồng bộ tên class và tên biến với Module 1 (KhachHang), Module 2 (Phong, PhongStandard, PhongVIP),
- * tối ưu hóa xử lý thời gian bằng java.time (LocalDate, DateTimeFormatter, ChronoUnit)
- * và tích hợp ngoại lệ từ Module4_Exception.
+ * Đã loại bỏ hoàn toàn giá phòng ví dụ 500k, lấy trực tiếp đối tượng Phong và giá phòng
+ * từ Module 2 (DanhSachPhong, Phong, PhongStandard, PhongVIP).
  */
 public class PhieuDatPhong implements INhapXuat {
 
@@ -86,9 +85,6 @@ public class PhieuDatPhong implements INhapXuat {
     // Các phương thức xử lý LocalDate & Ngoại lệ (Module4_Exception)
     // ---------------------------------------------------------------
 
-    /**
-     * Phân tích chuỗi ngày sang LocalDate bằng DateTimeFormatter.
-     */
     public static LocalDate phanTichNgay(String raw) {
         if (raw == null || raw.trim().isEmpty()) {
             return null;
@@ -101,9 +97,6 @@ public class PhieuDatPhong implements INhapXuat {
         }
     }
 
-    /**
-     * Kiểm tra tính hợp lệ của trình tự ngày đặt, ngày nhận và ngày trả phòng.
-     */
     public static void kiemTraLogicNgay(LocalDate ngayDat, LocalDate ngayNhan, LocalDate ngayTra) {
         if (ngayDat != null && ngayNhan != null && ngayNhan.isBefore(ngayDat)) {
             throw new Module4_Exception.NgayThangKhongHopLeException(
@@ -132,9 +125,6 @@ public class PhieuDatPhong implements INhapXuat {
         }
     }
 
-    /**
-     * Tính số ngày giữa hai mốc thời gian bằng ChronoUnit.DAYS.
-     */
     public static long soNgayGiua(String tuNgay, String denNgay) {
         LocalDate tu = phanTichNgay(tuNgay);
         LocalDate den = phanTichNgay(denNgay);
@@ -156,7 +146,7 @@ public class PhieuDatPhong implements INhapXuat {
     }
 
     // ---------------------------------------------------------------
-    // Nhập / Xuất (INhapXuat)
+    // Nhập / Xuất (INhapXuat) – Lấy phòng & giá trực tiếp từ Module 2
     // ---------------------------------------------------------------
 
     public void nhapPhieuDatPhong() {
@@ -176,23 +166,46 @@ public class PhieuDatPhong implements INhapXuat {
         String loaikhach = KiemTraLoi.nhapChuoiKhongRong(sc, "Nhap loai khach (Thuong / VIP / Doanh nghiep): ");
         this.khachHang = new KhachHang(hoten, CCCD, sdt, diachi, loaikhach, null);
 
-        ThongBao.inTieuDe("Chon phong");
-        System.out.println("1. Phong Standard");
-        System.out.println("2. Phong VIP");
-        int loaiPhong = KiemTraLoi.nhapSoNguyenTrongKhoang(sc, "Lua chon loai phong (1-2): ", 1, 2);
-        String maPhong = KiemTraLoi.nhapChuoiKhongRong(sc, "Nhap ma phong: ");
-        double giaCoBan = KiemTraLoi.nhapSoThucDuong(sc, "Nhap gia phong co ban moi dem (0 de dung mac dinh): ");
-        if (giaCoBan == 0) {
-            giaCoBan = (loaiPhong == 2) ? 1_000_000.0 : 500_000.0;
+        ThongBao.inTieuDe("Chon phong tu Module 2 (DanhSachPhong)");
+        DanhSachPhong dsPhongM2 = new DanhSachPhong(sc);
+        if (dsPhongM2.getSoLuong() > 0) {
+            System.out.println("Danh sach phong hien co trong Module 2 (phong.text):");
+            for (Phong p : dsPhongM2.getDanhSach()) {
+                if (p != null) {
+                    System.out.printf("  - Ma: %-6s | Loai: %-8s | Gia co ban: %,10.0f | Tong gia/dem: %,10.0f VND | Trang thai: %s%n",
+                            p.getMaPhong(),
+                            (p instanceof PhongVIP ? "VIP" : "Standard"),
+                            p.getGiaCoBan(),
+                            p.tinhGiaPhong(),
+                            p.getTrangThai());
+                }
+            }
         }
 
-        if (loaiPhong == 2) {
-            String loaiView = KiemTraLoi.nhapLoaiView(sc);
-            double phiDichVuDacBiet = KiemTraLoi.nhapSoThucDuong(sc, "Nhap phi dich vu dac biet (0 neu khong co): ");
-            this.phong = new PhongVIP(maPhong, giaCoBan, "Da dat", loaiView, phiDichVuDacBiet);
-        } else {
-            boolean coGiuongPhu = KiemTraLoi.nhapCoKhong(sc, "Co them giuong phu khong? (co/khong): ");
-            this.phong = new PhongStandard(maPhong, giaCoBan, "Da dat", coGiuongPhu);
+        while (true) {
+            String maPhong = KiemTraLoi.nhapChuoiKhongRong(sc, "Nhap ma phong tu danh sach Module 2 (VD: P101, P102, P201...): ");
+            Phong phongM2 = dsPhongM2.timKiemTheoMaPhong(maPhong);
+
+            if (phongM2 != null) {
+                this.phong = phongM2;
+                this.phong.setTrangThai("Da dat");
+                ThongBao.inThanhCong(String.format(
+                        "Da chon phong [%s] tu Module 2 -> Gia co ban: %,.0f VND | Don gia/dem (tinhGiaPhong): %,.0f VND",
+                        this.phong.getMaPhong(), this.phong.getGiaCoBan(), this.phong.tinhGiaPhong()));
+                break;
+            }
+
+            if (dsPhongM2.getSoLuong() == 0) {
+                System.out.println("Chua doc duoc file phong.text, khoi tao phong moi theo lop cua Module 2:");
+                int loaiPhong = KiemTraLoi.nhapSoNguyenTrongKhoang(sc, "Chon loai phong (1. Standard | 2. VIP): ", 1, 2);
+                Phong phongMoi = (loaiPhong == 1) ? new PhongStandard() : new PhongVIP();
+                phongMoi.nhap(sc);
+                phongMoi.setTrangThai("Da dat");
+                this.phong = phongMoi;
+                break;
+            } else {
+                ThongBao.inLoi("Khong tim thay ma phong '" + maPhong + "' trong danh sach phong cua Module 2! Vui long nhap lai.");
+            }
         }
 
         this.ngayDat = nhapLocalDate(sc, "Xin hay nhap ngay dat phong (dd/MM/yyyy): ");
@@ -228,9 +241,20 @@ public class PhieuDatPhong implements INhapXuat {
             ThongBao.inCanhBao("Chua co thong tin khach hang.");
         }
         System.out.println("Ma phong        : " + getMaPhong());
-        System.out.println("Loai phong      : " + (phong instanceof PhongVIP ? "Phong VIP"
-                : (phong instanceof PhongStandard ? "Phong Standard" : "Phong")));
-        System.out.printf("Don gia phong   : %,.0f VND/dem%n", getGiaPhongMotDem());
+        if (phong instanceof PhongVIP) {
+            PhongVIP vip = (PhongVIP) phong;
+            System.out.printf("Loai phong      : Phong VIP (View: %s)%n", vip.getLoaiView());
+            System.out.printf("Gia co ban      : %,.0f VND/dem%n", vip.getGiaCoBan());
+            System.out.printf("Phu thu view    : %,.0f VND/dem%n", vip.tinhPhuThuView());
+            System.out.printf("Phi DV dac biet : %,.0f VND/dem%n", vip.getPhiDichVuDacBiet());
+        } else if (phong instanceof PhongStandard) {
+            PhongStandard std = (PhongStandard) phong;
+            System.out.printf("Loai phong      : Phong Standard (Giuong phu: %s)%n", (std.isCoGiuongPhu() ? "Co (+100,000 VND)" : "Khong"));
+            System.out.printf("Gia co ban      : %,.0f VND/dem%n", std.getGiaCoBan());
+        } else {
+            System.out.println("Loai phong      : Phong");
+        }
+        System.out.printf("Don gia/dem(M2) : %,.0f VND/dem%n", getGiaPhongMotDem());
         System.out.println("Ngay dat phong  : " + getNgayDatStr());
         System.out.println("Ngay nhan phong : " + getNgayNhanStr());
         System.out.println("Ngay tra phong  : " + getNgayTraStr());
@@ -334,9 +358,6 @@ public class PhieuDatPhong implements INhapXuat {
         return (phong != null && phong.getMaPhong() != null) ? phong.getMaPhong() : "";
     }
 
-    /**
-     * Tính số đêm lưu trú bằng ChronoUnit.DAYS.between(ngayNhan, ngayTra).
-     */
     public long tinhSoNgayLuuTru() {
         if (ngayNhan == null || ngayTra == null) {
             return 1;
@@ -345,11 +366,11 @@ public class PhieuDatPhong implements INhapXuat {
         return (soNgay <= 0) ? 1 : soNgay;
     }
 
+    /**
+     * Lấy đơn giá phòng 1 đêm trực tiếp từ phương thức đa hình phong.tinhGiaPhong() của Module 2.
+     */
     public double getGiaPhongMotDem() {
-        if (phong != null && phong.tinhGiaPhong() > 0) {
-            return phong.tinhGiaPhong();
-        }
-        return 500_000.0;
+        return (phong != null) ? phong.tinhGiaPhong() : 0.0;
     }
 
     public double tinhTienPhong() {

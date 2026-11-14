@@ -14,12 +14,7 @@ import java.util.Scanner;
 
 /**
  * Lớp QuanLyDatPhong – Điều phối trung tâm cho Module 4 (Quản lý đặt phòng & Hóa đơn).
- * Đã đồng bộ hoàn toàn tên class và tên biến với:
- * - Module 1: KhachHang (hoten, CCCD, sdt, diachi, loaikhach)
- * - Module 2: Phong, PhongStandard (maPhong, giaCoBan, trangThai, coGiuongPhu),
- *             PhongVIP (maPhong, giaCoBan, trangThai, loaiView, phiDichVuDacBiet)
- * - Module 3: BT_quanLyKhachSan.DichVu (maDV, tenDV, donGia)
- * - ClassDungChung: INhapXuat, KiemTraLoi, ThongBao, Module4_Exception
+ * Đã loại bỏ hoàn toàn các giá phòng ví dụ (500k) và sử dụng trực tiếp DanhSachPhong từ Module 2.
  */
 public class QuanLyDatPhong {
 
@@ -37,7 +32,34 @@ public class QuanLyDatPhong {
     }
 
     /**
-     * Ưu tiên đọc dữ liệu từ file module4_data.txt; nếu không tìm thấy file thì nạp dữ liệu dự phòng.
+     * Lấy trực tiếp đối tượng Phong chuẩn từ DanhSachPhong của Module 2 theo maPhong.
+     */
+    private Phong layPhongTuModule2(DanhSachPhong dsPhongM2, String maPhong, String loaiPhong,
+            double giaCoBan, String thuocTinhPhong, double phiDichVuDacBiet) {
+        if (dsPhongM2 != null && maPhong != null) {
+            Phong pM2 = dsPhongM2.timKiemTheoMaPhong(maPhong);
+            if (pM2 != null) {
+                if (pM2 instanceof PhongVIP) {
+                    PhongVIP vipM2 = (PhongVIP) pM2;
+                    return new PhongVIP(vipM2.getMaPhong(), vipM2.getGiaCoBan(), "Da dat",
+                            vipM2.getLoaiView(), vipM2.getPhiDichVuDacBiet());
+                } else if (pM2 instanceof PhongStandard) {
+                    PhongStandard stdM2 = (PhongStandard) pM2;
+                    return new PhongStandard(stdM2.getMaPhong(), stdM2.getGiaCoBan(), "Da dat",
+                            stdM2.isCoGiuongPhu());
+                }
+            }
+        }
+        if ("VIP".equalsIgnoreCase(loaiPhong)) {
+            return new PhongVIP(maPhong, giaCoBan, "Da dat", thuocTinhPhong, phiDichVuDacBiet);
+        } else {
+            boolean coGiuongPhu = Boolean.parseBoolean(thuocTinhPhong);
+            return new PhongStandard(maPhong, giaCoBan, "Da dat", coGiuongPhu);
+        }
+    }
+
+    /**
+     * Ưu tiên đọc dữ liệu từ file module4_data.txt; nếu không tìm thấy file thì nạp dữ liệu từ Module 2.
      */
     public void napDuLieuSanCo() {
         File fileData = timFileDuLieu(FILE_DU_LIEU_MAC_DINH);
@@ -46,10 +68,10 @@ public class QuanLyDatPhong {
                 docDuLieuTuFile(fileData.getPath());
                 return;
             } catch (Module4_Exception e) {
-                ThongBao.inCanhBao(e.getMessage() + " -> Chuyển sang nạp dữ liệu mặc định.");
+                ThongBao.inCanhBao(e.getMessage() + " -> Chuyển sang nạp dữ liệu mặc định từ Module 2.");
             }
         }
-        napDuLieuMauMacDinh();
+        napDuLieuMauTuModule2();
     }
 
     private File timFileDuLieu(String tenFile) {
@@ -68,16 +90,21 @@ public class QuanLyDatPhong {
         return null;
     }
 
-    private void napDuLieuMauMacDinh() {
+    /**
+     * Nạp dữ liệu mẫu bằng cách tra cứu trực tiếp phòng từ DanhSachPhong của Module 2.
+     */
+    private void napDuLieuMauTuModule2() {
+        DanhSachPhong dsPhongM2 = new DanhSachPhong();
+
         KhachHang kh1 = new KhachHang("Nguyen Van An", "012345678901", "0901234567", "Ha Noi", "Thuong", null);
         KhachHang kh2 = new KhachHang("Tran Thi Bich", "079987654321", "0987654321", "TP Ho Chi Minh", "VIP", null);
         KhachHang kh3 = new KhachHang("Le Hoang Nam", "048123456789", "0912345678", "Da Nang", "Doanh nghiep", null);
         KhachHang kh4 = new KhachHang("Pham Minh Tuan", "036123456789", "0934567890", "Hai Phong", "Thuong", null);
 
-        PhongStandard p101 = new PhongStandard("P101", 500_000.0, "Da dat", true);
-        PhongVIP p201 = new PhongVIP("P201", 1_200_000.0, "Trong", "Bien", 200_000.0);
-        PhongStandard p102 = new PhongStandard("P102", 550_000.0, "Da dat", false);
-        PhongVIP p202 = new PhongVIP("P202", 1_000_000.0, "Trong", "Thanh pho", 150_000.0);
+        Phong p101 = dsPhongM2.timKiemTheoMaPhong("P101");
+        Phong p201 = dsPhongM2.timKiemTheoMaPhong("P201");
+        Phong p102 = dsPhongM2.timKiemTheoMaPhong("P102");
+        Phong p202 = dsPhongM2.timKiemTheoMaPhong("P202");
 
         PhieuDatPhong pdp1 = new PhieuDatPhong("PDP01", "01/12/2026", "02/12/2026", "05/12/2026", kh1, p101);
         PhieuDatPhong pdp2 = new PhieuDatPhong("PDP02", "03/12/2026", "04/12/2026", "08/12/2026", kh2, p201);
@@ -114,7 +141,7 @@ public class QuanLyDatPhong {
 
         HoaDon hd2 = new HoaDon("HD-PDP02", "08/12/2026", pdp2, cthd2, 100_000.0);
         hd2.setDaThanhToan(true);
-        p201.setTrangThai("Trong");
+        if (p201 != null) p201.setTrangThai("Trong");
         dsHoaDon.add(hd2);
 
         HoaDon hd3 = new HoaDon("HD-PDP03", "14/12/2026", pdp3, cthd3, 0.0);
@@ -122,7 +149,7 @@ public class QuanLyDatPhong {
 
         HoaDon hd4 = new HoaDon("HD-PDP04", "19/12/2026", pdp4, cthd4, 150_000.0);
         hd4.setDaThanhToan(true);
-        p202.setTrangThai("Trong");
+        if (p202 != null) p202.setTrangThai("Trong");
         dsHoaDon.add(hd4);
     }
 
@@ -131,7 +158,7 @@ public class QuanLyDatPhong {
     // ---------------------------------------------------------------
 
     /**
-     * Đọc dữ liệu từ file module4_data.txt vào hệ thống.
+     * Đọc dữ liệu từ file module4_data.txt và đồng bộ phòng trực tiếp từ DanhSachPhong (Module 2).
      */
     public void docDuLieuTuFile(String duongDan) {
         File f = timFileDuLieu(duongDan);
@@ -142,6 +169,8 @@ public class QuanLyDatPhong {
         dsPhieu.clear();
         dsHoaDon.clear();
         mapChiTietDichVu.clear();
+
+        DanhSachPhong dsPhongM2 = new DanhSachPhong();
 
         int soDongThanhCong = 0;
         try (BufferedReader br = new BufferedReader(
@@ -179,13 +208,8 @@ public class QuanLyDatPhong {
                 String thuocTinhPhong = p[12].trim();
                 double phiDichVuDacBiet = Double.parseDouble(p[13].trim());
 
-                Phong phong;
-                if ("VIP".equalsIgnoreCase(loaiPhong)) {
-                    phong = new PhongVIP(maPhong, giaCoBan, "Da dat", thuocTinhPhong, phiDichVuDacBiet);
-                } else {
-                    boolean coGiuongPhu = Boolean.parseBoolean(thuocTinhPhong);
-                    phong = new PhongStandard(maPhong, giaCoBan, "Da dat", coGiuongPhu);
-                }
+                Phong phong = layPhongTuModule2(dsPhongM2, maPhong, loaiPhong,
+                        giaCoBan, thuocTinhPhong, phiDichVuDacBiet);
 
                 PhieuDatPhong phieu = new PhieuDatPhong(maPhieu, ngayDat, ngayNhan, ngayTra, khachHang, phong);
                 dsPhieu.add(phieu);
@@ -219,7 +243,7 @@ public class QuanLyDatPhong {
         } catch (IOException | NumberFormatException e) {
             throw new Module4_Exception.DuLieuFileException("Lỗi khi đọc file '" + f.getPath() + "': " + e.getMessage());
         }
-        ThongBao.inThanhCong("Đã nạp thành công " + soDongThanhCong + " bản ghi từ file: " + f.getPath());
+        ThongBao.inThanhCong("Đã nạp thành công " + soDongThanhCong + " bản ghi (đồng bộ giá Module 2) từ file: " + f.getPath());
     }
 
     /**
@@ -233,18 +257,22 @@ public class QuanLyDatPhong {
 
         try (BufferedWriter bw = new BufferedWriter(
                 new OutputStreamWriter(new FileOutputStream(f), StandardCharsets.UTF_8))) {
-            bw.write("# ==============================================================================================\n");
-            bw.write("# BỘ DỮ LIỆU CHUẨN CHO MODULE 4 (QUẢN LÝ ĐẶT PHÒNG & HÓA ĐƠN) - FILE: module4_data.txt\n");
-            bw.write("# Cấu trúc: maPhieu;ngayDat;ngayNhan;ngayTra;hoten;CCCD;sdt;diachi;loaikhach;maPhong;loaiPhong;giaCoBan;thuocTinhPhong;phiDichVuDacBiet;dsDichVu;giamGia;daThanhToan;loaiThanhToan;thongTinThanhToan\n");
-            bw.write("# ==============================================================================================\n");
+            bw.write("# ==============================================================================================
+");
+            bw.write("# BỘ DỮ LIỆU CHUẨN CHO MODULE 4 (ĐỒNG BỘ GIÁ PHÒNG VỚI MODULE 2 - phong.text)
+");
+            bw.write("# Cấu trúc: maPhieu;ngayDat;ngayNhan;ngayTra;hoten;CCCD;sdt;diachi;loaikhach;maPhong;loaiPhong;giaCoBan;thuocTinhPhong;phiDichVuDacBiet;dsDichVu;giamGia;daThanhToan;loaiThanhToan;thongTinThanhToan
+");
+            bw.write("# ==============================================================================================
+");
 
             for (PhieuDatPhong p : dsPhieu) {
                 KhachHang khachHang = p.getKhachHang();
                 Phong phong = p.getPhong();
                 String loaiPhong = (phong instanceof PhongVIP) ? "VIP" : "Standard";
-                double giaCoBan = (phong != null) ? phong.getGiaCoBan() : 500000;
+                double giaCoBan = (phong != null) ? phong.getGiaCoBan() : 0.0;
                 String thuocTinhPhong = "false";
-                double phiDichVuDacBiet = 0;
+                double phiDichVuDacBiet = 0.0;
 
                 if (phong instanceof PhongVIP) {
                     thuocTinhPhong = ((PhongVIP) phong).getLoaiView();
@@ -280,7 +308,8 @@ public class QuanLyDatPhong {
                         sbDV.toString(), giamGia, daThanhToan,
                         (daThanhToan ? "DA_TT" : "CHUA_TT"),
                         (daThanhToan ? "Da thanh toan" : "Chua thanh toan"));
-                bw.write(line + "\n");
+                bw.write(line + "
+");
             }
             ThongBao.inThanhCong("Đã lưu thành công " + dsPhieu.size() + " bản ghi vào file: " + f.getPath());
         } catch (IOException e) {
@@ -357,20 +386,21 @@ public class QuanLyDatPhong {
             return;
         }
 
-        System.out.println("-----------------------------------------------------------------------------------------------------------------");
-        System.out.printf("| %-8s | %-20s | %-8s | %-12s | %-12s | %-8s | %-16s |%n",
-                "MA PHIEU", "KHACH HANG", "PHONG", "NGAY NHAN", "NGAY TRA", "SO DEM", "TIEN PHONG");
-        System.out.println("-----------------------------------------------------------------------------------------------------------------");
+        System.out.println("--------------------------------------------------------------------------------------------------------------------------------");
+        System.out.printf("| %-8s | %-18s | %-6s | %-12s | %-10s | %-10s | %-6s | %-13s | %-16s |%n",
+                "MA PHIEU", "KHACH HANG", "PHONG", "LOAI PHONG", "NGAY NHAN", "NGAY TRA", "SO DEM", "DON GIA/DEM", "TIEN PHONG");
+        System.out.println("--------------------------------------------------------------------------------------------------------------------------------");
         for (PhieuDatPhong p : dsPhieu) {
             String hoten = (p.getKhachHang() != null && p.getKhachHang().gethoten() != null)
                     ? p.getKhachHang().gethoten()
                     : "N/A";
-            System.out.printf("| %-8s | %-20s | %-8s | %-12s | %-12s | %-8d | %,16.0f |%n",
-                    p.getMaPhieu(), hoten, p.getMaPhong(),
+            String loai = (p.getPhong() instanceof PhongVIP) ? "VIP" : "Standard";
+            System.out.printf("| %-8s | %-18s | %-6s | %-12s | %-10s | %-10s | %-6d | %,13.0f | %,16.0f |%n",
+                    p.getMaPhieu(), hoten, p.getMaPhong(), loai,
                     p.getNgayNhanStr(), p.getNgayTraStr(),
-                    p.tinhSoNgayLuuTru(), p.tinhTienPhong());
+                    p.tinhSoNgayLuuTru(), p.getGiaPhongMotDem(), p.tinhTienPhong());
         }
-        System.out.println("-----------------------------------------------------------------------------------------------------------------");
+        System.out.println("--------------------------------------------------------------------------------------------------------------------------------");
     }
 
     // ---------------------------------------------------------------
