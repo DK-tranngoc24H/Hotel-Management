@@ -1,51 +1,57 @@
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.time.format.ResolverStyle;
+import java.time.temporal.ChronoUnit;
 import java.util.Scanner;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Lớp PhieuDatPhong – quản lý thông tin đặt phòng của khách hàng.
- * Khách lấy từ KHACHHANG (module 1), phòng lấy từ Phong (module 2).
+ * Đã đồng bộ tên class và tên biến với Module 1 (KhachHang), Module 2 (Phong, PhongStandard, PhongVIP),
+ * tối ưu hóa xử lý thời gian bằng java.time (LocalDate, DateTimeFormatter, ChronoUnit)
+ * và tích hợp ngoại lệ từ Module4_Exception.
  */
 public class PhieuDatPhong implements INhapXuat {
 
-    /** dd/MM/yyyy hoặc d/M/yyyy — nhóm 1 ngày, nhóm 2 tháng, nhóm 3 năm. */
-    public static final Pattern MAU_NGAY = Pattern.compile("^(\\d{1,2})/(\\d{1,2})/(\\d{4})$");
+    /** Định dạng chuẩn đầu vào (chấp nhận cả d/M/yyyy và dd/MM/yyyy với lịch nghiêm ngặt STRICT) */
+    public static final DateTimeFormatter PARSER_NGAY = DateTimeFormatter.ofPattern("d/M/uuuu")
+            .withResolverStyle(ResolverStyle.STRICT);
+    /** Định dạng chuẩn hiển thị (dd/MM/yyyy) */
+    public static final DateTimeFormatter FORMATTER_NGAY = DateTimeFormatter.ofPattern("dd/MM/uuuu");
+
     public static final Scanner sc = new Scanner(System.in);
 
     private String maPhieu;
-    private String ngayDat;
-    private String ngayNhan;
-    private String ngayTra;
+    private LocalDate ngayDat;
+    private LocalDate ngayNhan;
+    private LocalDate ngayTra;
 
-    private KHACHHANG khach;
+    private KhachHang khachHang;
     private Phong phong;
 
     /** Constructor mặc định – khởi tạo đối tượng rỗng */
     public PhieuDatPhong() {
         this.maPhieu = "PDP" + (System.currentTimeMillis() % 100000);
-        this.ngayDat = null;
+        this.ngayDat = LocalDate.now();
         this.ngayNhan = null;
         this.ngayTra = null;
-        this.khach = new KHACHHANG();
+        this.khachHang = new KhachHang();
         this.phong = null;
     }
 
     /**
-     * @param maPhieu  Mã phiếu đặt phòng
-     * @param ngayDat  Ngày đặt phòng (d/M/yyyy)
-     * @param ngayNhan Ngày nhận phòng (d/M/yyyy)
-     * @param ngayTra  Ngày trả phòng dự kiến (d/M/yyyy)
-     * @param khach    Khách hàng (module 1)
-     * @param phong    Phòng được đặt; mã phòng lấy từ phong.getMaPhong()
+     * Constructor đầy đủ sử dụng chuỗi ngày (d/M/yyyy hoặc dd/MM/yyyy).
      */
-    public PhieuDatPhong(String maPhieu, String ngayDat, String ngayNhan, String ngayTra, KHACHHANG khach,
+    public PhieuDatPhong(String maPhieu, String ngayDat, String ngayNhan, String ngayTra, KhachHang khachHang,
             Phong phong) {
         this.maPhieu = (maPhieu != null && !maPhieu.trim().isEmpty()) ? maPhieu.trim()
                 : ("PDP" + (System.currentTimeMillis() % 100000));
-        this.ngayDat = chuanHoaNgay(ngayDat);
-        this.ngayNhan = chuanHoaNgay(ngayNhan);
-        this.ngayTra = chuanHoaNgay(ngayTra);
-        this.khach = (khach != null) ? khach : new KHACHHANG();
+        this.ngayDat = phanTichNgay(ngayDat);
+        this.ngayNhan = phanTichNgay(ngayNhan);
+        this.ngayTra = phanTichNgay(ngayTra);
+        kiemTraLogicNgay(this.ngayDat, this.ngayNhan, this.ngayTra);
+
+        this.khachHang = (khachHang != null) ? khachHang : new KhachHang();
         this.phong = phong;
         if (this.phong != null) {
             this.phong.setTrangThai("Da dat");
@@ -53,19 +59,106 @@ public class PhieuDatPhong implements INhapXuat {
     }
 
     /**
-     * @param ngayDat  Ngày đặt phòng (d/M/yyyy)
-     * @param ngayNhan Ngày nhận phòng (d/M/yyyy)
-     * @param ngayTra  Ngày trả phòng dự kiến (d/M/yyyy)
-     * @param khach    Khách hàng (module 1)
-     * @param phong    Phòng được đặt; mã phòng lấy từ phong.getMaPhong()
+     * Constructor sử dụng trực tiếp đối tượng LocalDate.
      */
-    public PhieuDatPhong(String ngayDat, String ngayNhan, String ngayTra, KHACHHANG khach, Phong phong) {
-        this("PDP" + (phong != null && phong.getMaPhong() != null ? phong.getMaPhong()
-                : (System.currentTimeMillis() % 100000)),
-                ngayDat, ngayNhan, ngayTra, khach, phong);
+    public PhieuDatPhong(String maPhieu, LocalDate ngayDat, LocalDate ngayNhan, LocalDate ngayTra, KhachHang khachHang,
+            Phong phong) {
+        this.maPhieu = (maPhieu != null && !maPhieu.trim().isEmpty()) ? maPhieu.trim()
+                : ("PDP" + (System.currentTimeMillis() % 100000));
+        kiemTraLogicNgay(ngayDat, ngayNhan, ngayTra);
+        this.ngayDat = ngayDat;
+        this.ngayNhan = ngayNhan;
+        this.ngayTra = ngayTra;
+        this.khachHang = (khachHang != null) ? khachHang : new KhachHang();
+        this.phong = phong;
+        if (this.phong != null) {
+            this.phong.setTrangThai("Da dat");
+        }
     }
 
-    /** Nhập đầy đủ thông tin phiếu đặt phòng từ bàn phím */
+    public PhieuDatPhong(String ngayDat, String ngayNhan, String ngayTra, KhachHang khachHang, Phong phong) {
+        this("PDP" + (phong != null && phong.getMaPhong() != null ? phong.getMaPhong()
+                : (System.currentTimeMillis() % 100000)),
+                ngayDat, ngayNhan, ngayTra, khachHang, phong);
+    }
+
+    // ---------------------------------------------------------------
+    // Các phương thức xử lý LocalDate & Ngoại lệ (Module4_Exception)
+    // ---------------------------------------------------------------
+
+    /**
+     * Phân tích chuỗi ngày sang LocalDate bằng DateTimeFormatter.
+     */
+    public static LocalDate phanTichNgay(String raw) {
+        if (raw == null || raw.trim().isEmpty()) {
+            return null;
+        }
+        try {
+            return LocalDate.parse(raw.trim(), PARSER_NGAY);
+        } catch (DateTimeParseException e) {
+            throw new Module4_Exception.NgayThangKhongHopLeException(
+                    "Định dạng ngày '" + raw + "' không hợp lệ (yêu cầu dd/MM/yyyy, ví dụ: 07/11/2026).");
+        }
+    }
+
+    /**
+     * Kiểm tra tính hợp lệ của trình tự ngày đặt, ngày nhận và ngày trả phòng.
+     */
+    public static void kiemTraLogicNgay(LocalDate ngayDat, LocalDate ngayNhan, LocalDate ngayTra) {
+        if (ngayDat != null && ngayNhan != null && ngayNhan.isBefore(ngayDat)) {
+            throw new Module4_Exception.NgayThangKhongHopLeException(
+                    "Ngày nhận phòng (" + dinhDangNgay(ngayNhan) + ") không được trước ngày đặt phòng (" + dinhDangNgay(ngayDat) + ").");
+        }
+        if (ngayNhan != null && ngayTra != null && ngayTra.isBefore(ngayNhan)) {
+            throw new Module4_Exception.NgayThangKhongHopLeException(
+                    "Ngày trả phòng (" + dinhDangNgay(ngayTra) + ") không được trước ngày nhận phòng (" + dinhDangNgay(ngayNhan) + ").");
+        }
+    }
+
+    public static String dinhDangNgay(LocalDate date) {
+        return (date != null) ? date.format(FORMATTER_NGAY) : "";
+    }
+
+    public static String chuanHoaNgay(String raw) {
+        LocalDate d = phanTichNgay(raw);
+        return (d != null) ? d.format(FORMATTER_NGAY) : null;
+    }
+
+    public static boolean hopLeNgay(String raw) {
+        try {
+            return phanTichNgay(raw) != null;
+        } catch (Module4_Exception.NgayThangKhongHopLeException e) {
+            return false;
+        }
+    }
+
+    /**
+     * Tính số ngày giữa hai mốc thời gian bằng ChronoUnit.DAYS.
+     */
+    public static long soNgayGiua(String tuNgay, String denNgay) {
+        LocalDate tu = phanTichNgay(tuNgay);
+        LocalDate den = phanTichNgay(denNgay);
+        if (tu == null || den == null) {
+            throw new Module4_Exception.NgayThangKhongHopLeException("Ngày nhận hoặc ngày trả bị trống.");
+        }
+        return ChronoUnit.DAYS.between(tu, den);
+    }
+
+    private LocalDate nhapLocalDate(Scanner sc, String thongBao) {
+        while (true) {
+            String raw = KiemTraLoi.nhapChuoiKhongRong(sc, thongBao);
+            try {
+                return phanTichNgay(raw);
+            } catch (Module4_Exception.NgayThangKhongHopLeException e) {
+                ThongBao.inLoi(e.getMessage());
+            }
+        }
+    }
+
+    // ---------------------------------------------------------------
+    // Nhập / Xuất (INhapXuat)
+    // ---------------------------------------------------------------
+
     public void nhapPhieuDatPhong() {
         nhap(sc);
     }
@@ -77,11 +170,11 @@ public class PhieuDatPhong implements INhapXuat {
 
         ThongBao.inTieuDe("Nhap thong tin khach hang");
         String hoten = KiemTraLoi.nhapChuoiKhongRong(sc, "Nhap Ho va Ten: ");
-        String cccd = KiemTraLoi.nhapChuoiKhongRong(sc, "Nhap CCCD: ");
+        String CCCD = KiemTraLoi.nhapChuoiKhongRong(sc, "Nhap CCCD: ");
         String sdt = KiemTraLoi.nhapChuoiKhongRong(sc, "Nhap sdt: ");
         String diachi = KiemTraLoi.nhapChuoiKhongRong(sc, "Nhap Dia Chi: ");
         String loaikhach = KiemTraLoi.nhapChuoiKhongRong(sc, "Nhap loai khach (Thuong / VIP / Doanh nghiep): ");
-        this.khach = new KHACHHANG(hoten, cccd, sdt, diachi, loaikhach, null);
+        this.khachHang = new KhachHang(hoten, CCCD, sdt, diachi, loaikhach, null);
 
         ThongBao.inTieuDe("Chon phong");
         System.out.println("1. Phong Standard");
@@ -95,24 +188,32 @@ public class PhieuDatPhong implements INhapXuat {
 
         if (loaiPhong == 2) {
             String loaiView = KiemTraLoi.nhapLoaiView(sc);
-            double phiDacBiet = KiemTraLoi.nhapSoThucDuong(sc, "Nhap phi dich vu dac biet (0 neu khong co): ");
-            this.phong = new PhongVIP(maPhong, giaCoBan, "Da dat", loaiView, phiDacBiet);
+            double phiDichVuDacBiet = KiemTraLoi.nhapSoThucDuong(sc, "Nhap phi dich vu dac biet (0 neu khong co): ");
+            this.phong = new PhongVIP(maPhong, giaCoBan, "Da dat", loaiView, phiDichVuDacBiet);
         } else {
             boolean coGiuongPhu = KiemTraLoi.nhapCoKhong(sc, "Co them giuong phu khong? (co/khong): ");
             this.phong = new PhongStandard(maPhong, giaCoBan, "Da dat", coGiuongPhu);
         }
 
-        this.ngayDat = nhapNgay(sc, "Xin hay nhap ngay dat phong (d/M/yyyy): ");
-        this.ngayNhan = nhapNgay(sc, "Xin hay nhap ngay nhan phong (d/M/yyyy): ");
-        this.ngayTra = nhapNgay(sc, "Xin hay nhap ngay tra phong du kien (d/M/yyyy): ");
-        while (soNgayGiua(this.ngayNhan, this.ngayTra) < 0) {
-            ThongBao.inLoi("Ngay tra phong khong the truoc ngay nhan phong!");
-            this.ngayTra = nhapNgay(sc, "Xin hay nhap lai ngay tra phong (d/M/yyyy): ");
+        this.ngayDat = nhapLocalDate(sc, "Xin hay nhap ngay dat phong (dd/MM/yyyy): ");
+        while (true) {
+            this.ngayNhan = nhapLocalDate(sc, "Xin hay nhap ngay nhan phong (dd/MM/yyyy): ");
+            if (!this.ngayNhan.isBefore(this.ngayDat)) {
+                break;
+            }
+            ThongBao.inLoi("Ngày nhận phòng không được trước ngày đặt phòng (" + getNgayDatStr() + ")!");
+        }
+
+        while (true) {
+            this.ngayTra = nhapLocalDate(sc, "Xin hay nhap ngay tra phong du kien (dd/MM/yyyy): ");
+            if (!this.ngayTra.isBefore(this.ngayNhan)) {
+                break;
+            }
+            ThongBao.inLoi("Ngày trả phòng không được trước ngày nhận phòng (" + getNgayNhanStr() + ")!");
         }
         ThongBao.inThanhCong("Da nhap phieu dat phong.");
     }
 
-    /** Xuất thông tin phiếu đặt phòng ra màn hình */
     public void xuatPhieuDatPhong() {
         xuat();
     }
@@ -121,8 +222,8 @@ public class PhieuDatPhong implements INhapXuat {
     public void xuat() {
         ThongBao.inTieuDe("Phieu dat phong");
         System.out.println("Ma phieu dat    : " + (maPhieu != null ? maPhieu : "N/A"));
-        if (khach != null) {
-            khach.xuat();
+        if (khachHang != null) {
+            khachHang.xuat();
         } else {
             ThongBao.inCanhBao("Chua co thong tin khach hang.");
         }
@@ -130,141 +231,80 @@ public class PhieuDatPhong implements INhapXuat {
         System.out.println("Loai phong      : " + (phong instanceof PhongVIP ? "Phong VIP"
                 : (phong instanceof PhongStandard ? "Phong Standard" : "Phong")));
         System.out.printf("Don gia phong   : %,.0f VND/dem%n", getGiaPhongMotDem());
-        System.out.println("Ngay dat phong  : " + (ngayDat != null ? ngayDat : ""));
-        System.out.println("Ngay nhan phong : " + (ngayNhan != null ? ngayNhan : ""));
-        System.out.println("Ngay tra phong  : " + (ngayTra != null ? ngayTra : ""));
+        System.out.println("Ngay dat phong  : " + getNgayDatStr());
+        System.out.println("Ngay nhan phong : " + getNgayNhanStr());
+        System.out.println("Ngay tra phong  : " + getNgayTraStr());
         System.out.println("So dem luu tru  : " + tinhSoNgayLuuTru() + " dem");
         System.out.printf("Tien phong      : %,.0f VND%n", tinhTienPhong());
     }
 
-    private String nhapNgay(Scanner sc, String thongBao) {
-        while (true) {
-            String raw = KiemTraLoi.nhapChuoiKhongRong(sc, thongBao);
-            if (hopLeNgay(raw)) {
-                return raw;
-            }
-            ThongBao.inLoi("Ngay khong hop le. Vi du: 7/11/2026");
-        }
-    }
+    // ---------------------------------------------------------------
+    // Getters & Setters
+    // ---------------------------------------------------------------
 
-    /** Giữ chuỗi ngày nếu regex và lịch khớp; chuỗi rỗng trả về null. */
-    public static String chuanHoaNgay(String raw) {
-        if (raw == null || raw.trim().isEmpty()) {
-            return null;
-        }
-        String ngay = raw.trim();
-        if (!hopLeNgay(ngay)) {
-            throw new IllegalArgumentException("Ngay khong hop le: " + raw);
-        }
-        return ngay;
-    }
-
-    /**
-     * Regex tách ngày/tháng/năm, rồi kiểm tra số ngày trong tháng (kể cả năm
-     * nhuận).
-     */
-    public static boolean hopLeNgay(String raw) {
-        return tachNgay(raw) != null;
-    }
-
-    /**
-     * Số ngày từ ngày nhận đến ngày trả.
-     * Regex lấy d/m/y, rồi đổi mỗi ngày thành số ngày Julius để trừ.
-     */
-    public static long soNgayGiua(String tuNgay, String denNgay) {
-        int[] tu = tachNgay(tuNgay);
-        int[] den = tachNgay(denNgay);
-        if (tu == null || den == null) {
-            throw new IllegalArgumentException("Ngay khong hop le, khong tinh duoc so ngay luu tru.");
-        }
-        return soNgayJulius(den[0], den[1], den[2]) - soNgayJulius(tu[0], tu[1], tu[2]);
-    }
-
-    private static int[] tachNgay(String raw) {
-        if (raw == null) {
-            return null;
-        }
-        Matcher khop = MAU_NGAY.matcher(raw.trim());
-        if (!khop.matches()) {
-            return null;
-        }
-        int ngay = Integer.parseInt(khop.group(1));
-        int thang = Integer.parseInt(khop.group(2));
-        int nam = Integer.parseInt(khop.group(3));
-        if (thang < 1 || thang > 12 || ngay < 1 || ngay > soNgayTrongThang(thang, nam)) {
-            return null;
-        }
-        return new int[] { ngay, thang, nam };
-    }
-
-    private static int soNgayTrongThang(int thang, int nam) {
-        switch (thang) {
-            case 2:
-                return namNhuan(nam) ? 29 : 28;
-            case 4:
-            case 6:
-            case 9:
-            case 11:
-                return 30;
-            default:
-                return 31;
-        }
-    }
-
-    private static boolean namNhuan(int nam) {
-        return (nam % 4 == 0 && nam % 100 != 0) || (nam % 400 == 0);
-    }
-
-    /** Công thức Julius: biến một ngày lịch thành số ngày để trừ hai mốc. */
-    private static long soNgayJulius(int ngay, int thang, int nam) {
-        int a = (14 - thang) / 12;
-        int y = nam + 4800 - a;
-        int m = thang + 12 * a - 3;
-        return ngay + (153L * m + 2) / 5 + 365L * y + y / 4 - y / 100 + y / 400 - 32045;
-    }
-
-    public String getNgayDat() {
+    public LocalDate getNgayDatLocalDate() {
         return ngayDat;
     }
 
-    public String getNgayNhan() {
+    public LocalDate getNgayNhanLocalDate() {
         return ngayNhan;
     }
 
-    public String getNgayTra() {
+    public LocalDate getNgayTraLocalDate() {
         return ngayTra;
     }
 
+    public String getNgayDat() {
+        return getNgayDatStr();
+    }
+
+    public String getNgayNhan() {
+        return getNgayNhanStr();
+    }
+
+    public String getNgayTra() {
+        return getNgayTraStr();
+    }
+
     public String getNgayDatStr() {
-        return ngayDat != null ? ngayDat : "";
+        return dinhDangNgay(ngayDat);
     }
 
     public String getNgayNhanStr() {
-        return ngayNhan != null ? ngayNhan : "";
+        return dinhDangNgay(ngayNhan);
     }
 
     public String getNgayTraStr() {
-        return ngayTra != null ? ngayTra : "";
+        return dinhDangNgay(ngayTra);
     }
 
     public void setNgayDat(String ngayDat) {
-        this.ngayDat = chuanHoaNgay(ngayDat);
+        LocalDate d = phanTichNgay(ngayDat);
+        kiemTraLogicNgay(d, this.ngayNhan, this.ngayTra);
+        this.ngayDat = d;
     }
 
     public void setNgayNhan(String ngayNhan) {
-        this.ngayNhan = chuanHoaNgay(ngayNhan);
+        LocalDate d = phanTichNgay(ngayNhan);
+        kiemTraLogicNgay(this.ngayDat, d, this.ngayTra);
+        this.ngayNhan = d;
     }
 
     public void setNgayTra(String ngayTra) {
-        this.ngayTra = chuanHoaNgay(ngayTra);
+        LocalDate d = phanTichNgay(ngayTra);
+        kiemTraLogicNgay(this.ngayDat, this.ngayNhan, d);
+        this.ngayTra = d;
     }
 
-    public KHACHHANG getKhachHang() {
-        return this.khach;
+    public KhachHang getKhachHang() {
+        return this.khachHang;
     }
 
-    public void setKhachHang(KHACHHANG khach) {
-        this.khach = khach;
+    public void setKhachHang(KhachHang khachHang) {
+        if (khachHang == null) {
+            throw new Module4_Exception.PhieuDatPhongException("Thông tin khách hàng không được để trống (null).");
+        }
+        this.khachHang = khachHang;
     }
 
     public String getMaPhieu() {
@@ -272,7 +312,10 @@ public class PhieuDatPhong implements INhapXuat {
     }
 
     public void setMaPhieu(String maPhieu) {
-        this.maPhieu = maPhieu;
+        if (maPhieu == null || maPhieu.trim().isEmpty()) {
+            throw new Module4_Exception.PhieuDatPhongException("Mã phiếu đặt phòng không được để trống.");
+        }
+        this.maPhieu = maPhieu.trim();
     }
 
     public Phong getPhong() {
@@ -280,46 +323,36 @@ public class PhieuDatPhong implements INhapXuat {
     }
 
     public void setPhong(Phong phong) {
-        this.phong = phong;
-        if (this.phong != null) {
-            this.phong.setTrangThai("Da dat");
+        if (phong == null) {
+            throw new Module4_Exception.PhongKhongKhaDungException("Phòng gán cho phiếu đặt không được null.");
         }
+        this.phong = phong;
+        this.phong.setTrangThai("Da dat");
     }
 
-    /** Mã phòng lấy từ đối tượng Phong (module 2). */
     public String getMaPhong() {
         return (phong != null && phong.getMaPhong() != null) ? phong.getMaPhong() : "";
     }
 
     /**
-     * Tính số đêm lưu trú giữa ngày nhận và ngày trả.
+     * Tính số đêm lưu trú bằng ChronoUnit.DAYS.between(ngayNhan, ngayTra).
      */
     public long tinhSoNgayLuuTru() {
-        if (ngayNhan == null || ngayTra == null)
-            return 1;
-        try {
-            long soNgay = soNgayGiua(this.ngayNhan, this.ngayTra);
-            return (soNgay <= 0) ? 1 : soNgay;
-        } catch (Exception e) {
+        if (ngayNhan == null || ngayTra == null) {
             return 1;
         }
+        long soNgay = ChronoUnit.DAYS.between(ngayNhan, ngayTra);
+        return (soNgay <= 0) ? 1 : soNgay;
     }
 
-    /**
-     * Lấy đơn giá phòng 1 đêm từ đối tượng Phong (Module 2).
-     */
     public double getGiaPhongMotDem() {
         if (phong != null && phong.tinhGiaPhong() > 0) {
             return phong.tinhGiaPhong();
         }
-        return 500_000.0; // Mặc định 500.000 VNĐ/đêm nếu chưa cấu hình
+        return 500_000.0;
     }
 
-    /**
-     * Tính tổng chi phí tiền phòng = Đơn giá phòng/đêm × Số đêm lưu trú.
-     */
     public double tinhTienPhong() {
         return getGiaPhongMotDem() * tinhSoNgayLuuTru();
     }
-
 }

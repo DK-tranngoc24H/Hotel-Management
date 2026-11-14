@@ -2,24 +2,10 @@ import java.util.Scanner;
 
 /**
  * Lớp PhuongThucThanhToan – quản lý hình thức thanh toán của khách hàng.
- * Tích hợp toàn diện với:
- * - HoaDon (Module 4): Tính toán tổng tiền phòng và tiền dịch vụ
- * - PhieuDatPhong & Phong: Tự động cập nhật trạng thái phòng khi thanh toán /
- * trả phòng
- * - ClassDungChung: INhapXuat, KiemTraLoi, ThongBao
- * Hỗ trợ 4 hình thức thanh toán: Tiền mặt, Chuyển khoản, Thẻ tín dụng, Ví điện
- * tử.
+ * Tích hợp kiểm tra ngoại lệ bằng Module4_Exception.
  */
 public class PhuongThucThanhToan implements INhapXuat {
 
-    // ---------------------------------------------------------------
-    // Enum – Các loại hình thức thanh toán
-    // ---------------------------------------------------------------
-
-    /**
-     * Các hình thức thanh toán được hỗ trợ.
-     * Dùng enum thay vì chuỗi rời rạc để đảm bảo an toàn kiểu dữ liệu.
-     */
     public enum LoaiThanhToan {
         TIEN_MAT("Tien mat"),
         CHUYEN_KHOAN("Chuyen khoan ngan hang"),
@@ -37,46 +23,28 @@ public class PhuongThucThanhToan implements INhapXuat {
         }
     }
 
-    // ---------------------------------------------------------------
-    // Thuộc tính
-    // ---------------------------------------------------------------
-    private LoaiThanhToan loaiThanhToan; // Hình thức thanh toán đã chọn
-    private HoaDon hoaDon; // Hóa đơn cần thanh toán
-    private double tienKhachDua; // Tiền khách đưa (nếu dùng tiền mặt)
-    private double tienThoiLai; // Tiền thối lại cho khách
-    private String maGiaoDich; // Mã giao dịch thanh toán
-    private String thongTinNganHangHoacThe; // Tên ngân hàng / Loại thẻ / Ví điện tử
-    private String trangThaiThanhToan; // "Chua thanh toan", "Da thanh toan"
+    private LoaiThanhToan loaiThanhToan;
+    private HoaDon hoaDon;
+    private double tienKhachDua;
+    private double tienThoiLai;
+    private String maGiaoDich;
+    private String thongTinNganHangHoacThe;
+    private String trangThaiThanhToan;
 
-    // ---------------------------------------------------------------
-    // Constructors
-    // ---------------------------------------------------------------
-
-    /**
-     * Tạo đối tượng thanh toán với hình thức đã biết và hóa đơn.
-     *
-     * @param loaiThanhToan Hình thức thanh toán (enum LoaiThanhToan)
-     * @param hoaDon        Hóa đơn cần thanh toán
-     */
     public PhuongThucThanhToan(LoaiThanhToan loaiThanhToan, HoaDon hoaDon) {
-        this.loaiThanhToan = loaiThanhToan;
+        if (hoaDon == null) {
+            throw new Module4_Exception.ThanhToanKhongHopLeException("Không thể khởi tạo thanh toán khi hóa đơn bị trống (null).");
+        }
+        this.loaiThanhToan = (loaiThanhToan != null) ? loaiThanhToan : LoaiThanhToan.TIEN_MAT;
         this.hoaDon = hoaDon;
-        this.tienKhachDua = (hoaDon != null) ? hoaDon.getTongTienPhong() : 0.0;
+        this.tienKhachDua = hoaDon.getTongTienPhong();
         this.tienThoiLai = 0.0;
         this.maGiaoDich = "GD" + (System.currentTimeMillis() % 1000000);
         this.thongTinNganHangHoacThe = "Mac dinh";
         this.trangThaiThanhToan = "Da thanh toan";
-        if (this.hoaDon != null) {
-            this.hoaDon.setDaThanhToan(true);
-        }
+        this.hoaDon.setDaThanhToan(true);
     }
 
-    /**
-     * Tạo đối tượng thanh toán từ hóa đơn (người dùng sẽ chọn hình thức sau qua
-     * nhap()).
-     *
-     * @param hoaDon Hóa đơn cần thanh toán
-     */
     public PhuongThucThanhToan(HoaDon hoaDon) {
         this.loaiThanhToan = null;
         this.hoaDon = hoaDon;
@@ -87,25 +55,28 @@ public class PhuongThucThanhToan implements INhapXuat {
         this.trangThaiThanhToan = "Chua thanh toan";
     }
 
-    /**
-     * Constructor mặc định.
-     */
     public PhuongThucThanhToan() {
         this(null);
     }
 
-    // ---------------------------------------------------------------
-    // Nhập hình thức thanh toán & chi tiết giao dịch (INhapXuat)
-    // ---------------------------------------------------------------
+    public void kiemTraDuSoTien(double soTienDua, double tongCanTra) {
+        if (soTienDua < tongCanTra) {
+            throw new Module4_Exception.ThanhToanKhongHopLeException(
+                    "Số tiền khách đưa chưa đủ (còn thiếu " + String.format("%,.0f VND", (tongCanTra - soTienDua)) + ")! Vui lòng nhập lại.");
+        }
+    }
 
-    /**
-     * Chọn hình thức thanh toán từ bàn phím và xử lý tương ứng.
-     */
     @Override
     public void nhap(Scanner sc) {
-        ThongBao.inTieuDe("CHON HINH THUC VA THUC HIEN THANH TOAN");
+        if (hoaDon == null) {
+            throw new Module4_Exception.ThanhToanKhongHopLeException("Chưa có hóa đơn để thực hiện thanh toán.");
+        }
+        if (hoaDon.isDaThanhToan()) {
+            throw new Module4_Exception.ThanhToanKhongHopLeException("Hóa đơn [" + hoaDon.getMaHoaDon() + "] đã được thanh toán trước đó.");
+        }
 
-        double tongTien = (hoaDon != null) ? hoaDon.getTongTienPhong() : 0.0;
+        ThongBao.inTieuDe("CHON HINH THUC VA THUC HIEN THANH TOAN");
+        double tongTien = hoaDon.getTongTienPhong();
         System.out.printf("TONG SO TIEN CAN THANH TOAN: %,.0f VND%n%n", tongTien);
 
         System.out.println("Cac hinh thuc thanh toan duoc chap nhan:");
@@ -153,14 +124,14 @@ public class PhuongThucThanhToan implements INhapXuat {
 
                 if (tongTien > 0) {
                     while (true) {
-                        double dua = KiemTraLoi.nhapSoThucDuong(sc, "Nhap so tien khach dua (VND): ");
-                        if (dua >= tongTien) {
+                        try {
+                            double dua = KiemTraLoi.nhapSoThucDuong(sc, "Nhap so tien khach dua (VND): ");
+                            kiemTraDuSoTien(dua, tongTien);
                             tienKhachDua = dua;
                             tienThoiLai = dua - tongTien;
                             break;
-                        } else {
-                            ThongBao.inLoi("So tien khach dua chua du (thieu " +
-                                    String.format("%,.0f VND", (tongTien - dua)) + ")! Vui long nhap lai.");
+                        } catch (Module4_Exception.ThanhToanKhongHopLeException e) {
+                            ThongBao.inLoi(e.getMessage());
                         }
                     }
                     if (tienThoiLai > 0) {
@@ -174,46 +145,40 @@ public class PhuongThucThanhToan implements INhapXuat {
         }
 
         this.trangThaiThanhToan = "Da thanh toan";
-        if (this.hoaDon != null) {
-            this.hoaDon.setDaThanhToan(true);
-            if (this.hoaDon.getPhieu() != null && this.hoaDon.getPhieu().getPhong() != null) {
-                this.hoaDon.getPhieu().getPhong().setTrangThai("Trong");
-            }
+        this.hoaDon.setDaThanhToan(true);
+        if (this.hoaDon.getPhieu() != null && this.hoaDon.getPhieu().getPhong() != null) {
+            this.hoaDon.getPhieu().getPhong().setTrangThai("Trong");
         }
         ThongBao.inThanhCong("GIAO DICH THANH TOAN HOAN TAT!");
     }
 
-    // ---------------------------------------------------------------
-    // Thực hiện & Xuất biên lai thanh toán
-    // ---------------------------------------------------------------
-
-    /**
-     * Thực hiện thanh toán và in hóa đơn cùng biên lai.
-     */
     public void thucHienThanhToan() {
+        if (hoaDon == null) {
+            throw new Module4_Exception.ThanhToanKhongHopLeException("Chưa có thông tin hóa đơn để thực hiện thanh toán.");
+        }
         if (loaiThanhToan == null) {
             loaiThanhToan = LoaiThanhToan.TIEN_MAT;
         }
         if (maGiaoDich == null || maGiaoDich.isEmpty()) {
             maGiaoDich = "GD" + String.format("%06d", (System.currentTimeMillis() % 1000000));
         }
-        if (hoaDon != null && tienKhachDua == 0.0) {
+        if (tienKhachDua == 0.0) {
             tienKhachDua = hoaDon.getTongTienPhong();
             tienThoiLai = 0.0;
+        } else {
+            kiemTraDuSoTien(tienKhachDua, hoaDon.getTongTienPhong());
+            tienThoiLai = tienKhachDua - hoaDon.getTongTienPhong();
         }
         this.trangThaiThanhToan = "Da thanh toan";
-        if (this.hoaDon != null) {
-            this.hoaDon.setDaThanhToan(true);
-            if (this.hoaDon.getPhieu() != null && this.hoaDon.getPhieu().getPhong() != null) {
-                this.hoaDon.getPhieu().getPhong().setTrangThai("Trong");
-            }
+        this.hoaDon.setDaThanhToan(true);
+        if (this.hoaDon.getPhieu() != null && this.hoaDon.getPhieu().getPhong() != null) {
+            this.hoaDon.getPhieu().getPhong().setTrangThai("Trong");
         }
         xuat();
     }
 
     @Override
     public void xuat() {
-        // 1. In toàn bộ hóa đơn chi tiết kết hợp tiền phòng & tiền dịch vụ
         if (hoaDon != null) {
             hoaDon.xuat();
         } else {
@@ -225,7 +190,6 @@ public class PhuongThucThanhToan implements INhapXuat {
             return;
         }
 
-        // 2. In biên lai giao dịch thanh toán
         ThongBao.inTieuDe("BIEN LAI XAC NHAN THANH TOAN");
         double tongTien = (hoaDon != null) ? hoaDon.getTongTienPhong() : 0.0;
 
@@ -241,14 +205,10 @@ public class PhuongThucThanhToan implements INhapXuat {
         }
         System.out.printf("  - Trang thai giao dich    : %s%n",
                 ("Da thanh toan".equalsIgnoreCase(trangThaiThanhToan) ? "THANH CONG (PAID)" : "CHUA HOAN TAT"));
-        System.out.println(
-                "==================================================================================================");
+        System.out.println("==================================================================================================");
         ThongBao.inThanhCong("Cam on quy khach da su dung dich vu cua khach san!");
     }
 
-    // ---------------------------------------------------------------
-    // Getters & Setters
-    // ---------------------------------------------------------------
     public LoaiThanhToan getLoaiThanhToan() {
         return loaiThanhToan;
     }
@@ -270,6 +230,9 @@ public class PhuongThucThanhToan implements INhapXuat {
     }
 
     public void setTienKhachDua(double tienKhachDua) {
+        if (tienKhachDua < 0) {
+            throw new Module4_Exception.ThanhToanKhongHopLeException("Số tiền khách đưa không được âm.");
+        }
         this.tienKhachDua = tienKhachDua;
     }
 
@@ -308,5 +271,4 @@ public class PhuongThucThanhToan implements INhapXuat {
     public boolean isDaThanhToan() {
         return "Da thanh toan".equalsIgnoreCase(this.trangThaiThanhToan);
     }
-
 }

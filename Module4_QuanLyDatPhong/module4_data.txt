@@ -1,0 +1,11 @@
+# ==============================================================================================
+# BỘ DỮ LIỆU CHUẨN CHO MODULE 4 (QUẢN LÝ ĐẶT PHÒNG & HÓA ĐƠN) - FILE: module4_data.txt
+# Cấu trúc mỗi dòng (ngăn cách bằng dấu chấm phẩy ';'):
+# maPhieu;ngayDat;ngayNhan;ngayTra;hoTen;cccd;sdt;diaChi;loaiKhach;maPhong;loaiPhong;giaCoBan;thuocTinhPhong;phuThuVIP;dsDichVu(maDV:soLuong,...);giamGia;daThanhToan;loaiThanhToan;thongTinThanhToan
+# ==============================================================================================
+PDP01;01/12/2026;02/12/2026;05/12/2026;Nguyen Van An;012345678901;0901234567;Ha Noi;Thuong;P101;Standard;500000;true;0;DA01:2,NU01:2;50000;false;CHUA_TT;Chua thanh toan
+PDP02;03/12/2026;04/12/2026;08/12/2026;Tran Thi Bich;079987654321;0987654321;TP Ho Chi Minh;VIP;P201;VIP;1200000;Bien;200000;SG01:2,TX02:1;100000;true;CHUYEN_KHOAN;Vietcombank - GD982341
+PDP03;10/12/2026;11/12/2026;14/12/2026;Le Hoang Nam;048123456789;0912345678;Da Nang;Doanh nghiep;P102;Standard;550000;false;0;DA03:2,NU02:2;0;false;CHUA_TT;Chua thanh toan
+PDP04;15/12/2026;16/12/2026;19/12/2026;Pham Minh Tuan;036123456789;0934567890;Hai Phong;Thuong;P202;VIP;1000000;Thanh pho;150000;SG03:2,TX03:1;150000;true;THE_TIN_DUNG;Visa - Pham Minh Tuan
+PDP05;18/12/2026;19/12/2026;22/12/2026;Hoang Thuy Linh;001123456789;0945678901;Quang Ninh;VIP;P203;VIP;900000;San vuon;100000;DA05:1,NU03:2,SG02:2;50000;true;VI_DIEN_TU;MoMo - 0945678901
+PDP06;20/12/2026;21/12/2026;25/12/2026;Dang Quoc Huy;092123456789;0956789012;Can Tho;Doanh nghiep;P301;VIP;2000000;Bien;500000;DA04:4,SG01:2,TX04:1;200000;false;CHUA_TT;Chua thanh toan
