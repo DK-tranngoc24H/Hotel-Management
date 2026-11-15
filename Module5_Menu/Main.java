@@ -12,8 +12,9 @@ public class Main {
     private static final double GIA_CO_BAN_STANDARD = 500000.0;
     private static final double GIA_CO_BAN_VIP = 1200000.0;
 
+    private final Scanner sc = new Scanner(System.in);
     private final DanhSachNguoi qlNguoi = new DanhSachNguoi();
-    private final DanhSachPhong qlPhong = new DanhSachPhong();
+    private final DanhSachPhong qlPhong = new DanhSachPhong(sc);
     private final QuanLyLichSuDatPhong qlLichSu = new QuanLyLichSuDatPhong();
     private String vaiTroHienTai = "";
 
@@ -27,7 +28,6 @@ public class Main {
     }
 
     public void chayMenu() {
-        Scanner sc = new Scanner(System.in);
         while (true) {
             if (!dangNhap(sc)) {
                 System.out.println("Da thoat chuong trinh.");
@@ -199,7 +199,8 @@ public class Main {
             System.out.println("3. Cap nhat tien nghi phong [Quan ly]");
             System.out.println("4. Them phong Standard [Quan ly]");
             System.out.println("5. Them phong VIP [Quan ly]");
-            System.out.println("6. Ghi danh sach phong ra file (phong.text) [Quan ly]");
+            System.out.println("6. Xoa phong [Quan ly]");
+            System.out.println("7. Ghi danh sach phong ra file (phong.text) [Quan ly]");
             System.out.println("0. Quay lai");
             switch (KiemTraLoi.nhapSoNguyenDuong(sc, "Chon: ")) {
                 case 1:
@@ -228,6 +229,7 @@ public class Main {
                     if (KiemTraLoi.nhapCoKhong(sc, "Ban co muon tuy chinh tien nghi rieng khong? (co/khong): ")) {
                         phongStd.getTienNghi().nhap(sc);
                     }
+                            
                     qlPhong.them(phongStd);
                     qlPhong.ghiFileMacDinh();
                     System.out.println("Them phong Standard thanh cong.");
@@ -251,6 +253,14 @@ public class Main {
                     System.out.println("Them phong VIP thanh cong.");
                     break;
                 case 6:
+                    if (!isQuanLy()) {
+                        System.out.println("-> Tu choi quyen: Chi QUAN LY moi duoc xoa phong!");
+                        break;
+                    }
+                    qlPhong.xoaPhong();
+                    qlPhong.ghiFileMacDinh();
+                    break;
+                case 7:
                     if (!isQuanLy()) {
                         System.out.println("-> Tu choi quyen: Chi QUAN LY moi duoc ghi file phong!");
                         break;
@@ -349,6 +359,7 @@ public class Main {
 
     private void menuDatPhong(Scanner sc) {
         while (true) {
+                
             System.out.println("\n--- DAT PHONG VA LICH SU ---");
             System.out.println("1. Tao phieu dat phong");
             System.out.println("2. Them dich vu cho phieu dat");
@@ -358,6 +369,7 @@ public class Main {
             System.out.println("6. Xem lich su va doanh thu [Quan ly]");
             System.out.println("7. Xem danh sach dich vu");
             System.out.println("8. Quan ly dich vu khach san (dichvu.txt) [Quan ly]");
+                
             System.out.println("9. Ghi du lieu dat phong ra file (module4_data.txt)");
             System.out.println("0. Quay lai");
             switch (KiemTraLoi.nhapSoNguyenDuong(sc, "Chon: ")) {
@@ -381,6 +393,7 @@ public class Main {
                     BanGhiLichSu bgHuy = qlLichSu.timTheoMaPhieu(maHuy);
                     if (bgHuy == null) {
                         System.out.println("Khong tim thay ma phieu '" + maHuy + "'.");
+                    
                     } else if (bgHuy.getTrangThai() == TrangThai.DANG_O) {
                         System.out.println("-> Loi: Khong the huy phieu dang luu tru (DANG_O)! Vui long thanh toan - tra phong.");
                     } else if (qlLichSu.huyDatPhong(maHuy)) {
@@ -420,11 +433,13 @@ public class Main {
     }
 
     private void taoPhieu(Scanner sc) {
-        System.out.println("\n--- TAO PHIEU DAT PHONG ---");
+        System.out.println("\n--- TAO PHIEU
+                                 DAT PHONG ---");
         boolean coPhongTrong = false;
         for (Phong p : qlPhong.getDanhSach()) {
             if (p.conTrong()) {
                 coPhongTrong = true;
+                                
                 break;
             }
         }
@@ -501,14 +516,17 @@ public class Main {
 
     private void themDichVuChoKhach(Scanner sc) {
         String maPhieu = KiemTraLoi.nhapChuoiKhongRong(sc, "Ma phieu: ");
-        BanGhiLichSu banGhi = qlLichSu.timTheoMaPhieu(maPhieu);
+        BanGhiLichSu banGhi = qlLichSu.timTheoMaPhieu(maPhieu)
+                        
         if (banGhi == null) {
-            System.out.println("-> Loi: Khong tim thay phieu dat phong '" + maPhieu + "'.");
+            System.out.println("-> Loi: Khong tim thay phieu dat phong '" + maPhieu + "'
+                        ");
             return;
         }
         if (banGhi.getTrangThai() == TrangThai.DA_HUY || banGhi.getTrangThai() == TrangThai.DA_TRA_PHONG) {
             System.out.println("-> Loi: Khong the them dich vu cho phieu o trang thai "
                     + banGhi.getTrangThai().getTenHienThi() + ".");
+        // 
             return;
         }
 
@@ -579,9 +597,11 @@ public class Main {
                 case 4:
                     dsDV.hienThi();
                     qlDV.xoa();
+                    
                     break;
                 case 5:
-                    dsDV.ghiFile();
+                    dsDV.g
+                        hiFile();
                     System.out.println("-> Da luu danh sach dich vu ra file dichvu.txt.");
                     break;
                 case 0:
@@ -639,15 +659,18 @@ public class Main {
 
     private String nhapHoTenHopLe(Scanner sc) {
         while (true) {
-            String hoTen = KiemTraLoi.nhapChuoiKhongRong(sc, "Ho ten: ");
+            String hoTen = Kiem
+                    TraLoi.nhapChuoiKhongRong(sc, "Ho ten: ");
             if (Nguoi.kiemTraHoTen(hoTen)) {
                 return hoTen;
             }
-            System.out.println("-> Loi: Ho ten chi duoc chua chu cai va khoang trang (khong chua so hoac ky tu dac biet)!");
+            System.out.println(
+                    "-> Loi: Ho ten chi duoc chua chu cai va khoang trang (khong chua so hoac ky tu dac biet)!");
         }
     }
 
     private String nhapCCCDHopLe(Scanner sc) {
+                
         while (true) {
             String cccd = KiemTraLoi.nhapChuoiKhongRong(sc, "CCCD (12 chu so): ");
             if (cccd.matches("\\d{12}")) {
@@ -658,7 +681,8 @@ public class Main {
     }
 
     private String nhapSDTHopLe(Scanner sc) {
-        while (true) {
+        while (true)  
+            
             String sdt = KiemTraLoi.nhapChuoiKhongRong(sc, "So dien thoai (10 chu so, bat dau bang 0): ");
             if (Nguoi.kiemTraSDT(sdt)) {
                 return sdt;
@@ -682,6 +706,7 @@ public class Main {
             if (!s.contains(";")) {
                 return s;
             }
+                    
             System.out.println("-> Loi: Khong duoc chua ky tu ';'.");
         }
     }
@@ -700,3 +725,9 @@ public class Main {
         new Main().chayMenu();
     }
 }
+
+            
+                
+                
+
+    
