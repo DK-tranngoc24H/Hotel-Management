@@ -6,12 +6,12 @@ import java.util.Scanner;
  */
 public class TienNghiPhong implements INhapXuat {
     private String maTienNghi;
-    private boolean coTivi;          // Tiện nghi Tivi
-    private boolean coTuLanh;        // Tiện nghi Tủ lạnh / Mini bar
-    private boolean coDieuHoa;       // Tiện nghi Điều hòa nhiệt độ
-    private boolean coBinhNongLanh;  // Tiện nghi Bình nóng lạnh
-    private boolean coWifi;          // Tiện nghi Wifi internet
-    private String tinhTrang;        // Tình trạng: "Tot", "Binh thuong", "Can sua", "Hong"
+    private boolean coTivi; // Tiện nghi Tivi
+    private boolean coTuLanh; // Tiện nghi Tủ lạnh / Mini bar
+    private boolean coDieuHoa; // Tiện nghi Điều hòa nhiệt độ
+    private boolean coBinhNongLanh; // Tiện nghi Bình nóng lạnh
+    private boolean coWifi; // Tiện nghi Wifi internet
+    private String tinhTrang; // Tình trạng: "Tot", "Binh thuong", "Can sua", "Hong"
 
     // Constructor mặc định (khởi tạo phòng có các tiện nghi cơ bản)
     public TienNghiPhong() {
@@ -25,8 +25,8 @@ public class TienNghiPhong implements INhapXuat {
     }
 
     // Constructor đầy đủ tham số các loại tiện nghi cụ thể
-    public TienNghiPhong(String maTienNghi, boolean coTivi, boolean coTuLanh, 
-                        boolean coDieuHoa, boolean coBinhNongLanh, boolean coWifi, String tinhTrang) {
+    public TienNghiPhong(String maTienNghi, boolean coTivi, boolean coTuLanh,
+            boolean coDieuHoa, boolean coBinhNongLanh, boolean coWifi, String tinhTrang) {
         this.maTienNghi = maTienNghi;
         this.coTivi = coTivi;
         this.coTuLanh = coTuLanh;
@@ -43,7 +43,8 @@ public class TienNghiPhong implements INhapXuat {
         String tenLower = (tenTienNghi != null) ? tenTienNghi.toLowerCase() : "";
         this.coTivi = tenLower.contains("tivi") || tenLower.contains("tv");
         this.coTuLanh = tenLower.contains("tu lanh") || tenLower.contains("tủ lạnh");
-        this.coDieuHoa = tenLower.contains("dieu hoa") || tenLower.contains("điều hòa") || tenLower.contains("may lanh");
+        this.coDieuHoa = tenLower.contains("dieu hoa") || tenLower.contains("điều hòa")
+                || tenLower.contains("may lanh");
         this.coBinhNongLanh = tenLower.contains("nong lanh") || tenLower.contains("nóng lạnh");
         this.coWifi = true;
         // Nếu chuỗi chung chung thì bật các tiện nghi cơ bản
@@ -111,25 +112,19 @@ public class TienNghiPhong implements INhapXuat {
         this.tinhTrang = tinhTrang;
     }
 
-    // Đếm tổng số lượng tiện nghi mà phòng đang có
-    public int getSoLuong() {
-        int sl = 0;
-        if (coTivi) sl++;
-        if (coTuLanh) sl++;
-        if (coDieuHoa) sl++;
-        if (coBinhNongLanh) sl++;
-        if (coWifi) sl++;
-        return sl;
-    }
-
     // Lấy chuỗi danh sách các tiện nghi đang có trong phòng
     public String getTenTienNghi() {
         StringBuilder sb = new StringBuilder();
-        if (coTivi) sb.append("Tivi, ");
-        if (coTuLanh) sb.append("Tu lanh, ");
-        if (coDieuHoa) sb.append("Dieu hoa, ");
-        if (coBinhNongLanh) sb.append("Binh nong lanh, ");
-        if (coWifi) sb.append("Wifi, ");
+        if (coTivi)
+            sb.append("Tivi, ");
+        if (coTuLanh)
+            sb.append("Tu lanh, ");
+        if (coDieuHoa)
+            sb.append("Dieu hoa, ");
+        if (coBinhNongLanh)
+            sb.append("Binh nong lanh, ");
+        if (coWifi)
+            sb.append("Wifi, ");
 
         if (sb.length() > 0) {
             sb.setLength(sb.length() - 2); // Cắt bỏ dấu phẩy cuối cùng
@@ -151,7 +146,23 @@ public class TienNghiPhong implements INhapXuat {
         this.coDieuHoa = KiemTraLoi.nhapCoKhong(sc, "  + Co Dieu hoa khong? (co/khong): ");
         this.coBinhNongLanh = KiemTraLoi.nhapCoKhong(sc, "  + Co Binh nong lanh khong? (co/khong): ");
         this.coWifi = KiemTraLoi.nhapCoKhong(sc, "  + Co Wifi khong? (co/khong): ");
-        this.tinhTrang = KiemTraLoi.nhapChuoiKhongRong(sc, "  + Nhap tinh trang tien nghi (Tot / Can sua / Hong): ");
+        this.tinhTrang = nhapTinhTrangHopLe(sc);
+    }
+
+    private String nhapTinhTrangHopLe(Scanner sc) {
+        while (true) {
+            String tt = KiemTraLoi.nhapChuoiKhongRong(sc, "  + Nhap tinh trang tien nghi (Tot / Can sua / Hong): ");
+            if (tt.equalsIgnoreCase("tot") || tt.equalsIgnoreCase("tốt")) {
+                return "Tot";
+            }
+            if (tt.equalsIgnoreCase("can sua") || tt.equalsIgnoreCase("cần sửa") || tt.equalsIgnoreCase("cansua")) {
+                return "Can sua";
+            }
+            if (tt.equalsIgnoreCase("hong") || tt.equalsIgnoreCase("hỏng")) {
+                return "Hong";
+            }
+            ThongBao.inLoi("Tinh trang chi duoc nhap: Tot, Can sua hoac Hong!");
+        }
     }
 
     @Override

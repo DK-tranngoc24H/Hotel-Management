@@ -1,6 +1,8 @@
 import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Locale;
+import java.util.List;
 import java.util.Scanner;
 
 public class DanhSachNguoi implements IQuanLy {
@@ -58,22 +60,14 @@ public class DanhSachNguoi implements IQuanLy {
 		while (true) {
 			System.out.println("Chon loai doi tuong can tao:");
 			System.out.println("1. Khach hang");
-			System.out.println("2. Nhan vien thuong");
-			System.out.println("3. Quan ly");
-			int chon = nhapSoNguyenTrongKhoang("Lua chon cua ban (1-3): ", 1, 3);
+			System.out.println("2. Nhan vien");
+			int chon = nhapSoNguyenTrongKhoang("Lua chon cua ban (1-2): ", 1, 2);
 
 			Nguoi x;
-			switch (chon) {
-				case 2:
-					x = new NhanVien();
-					break;
-				case 3:
-					x = new QuanLy();
-					break;
-				case 1:
-				default:
-					x = new KhachHang();
-					break;
+			if (chon == 2) {
+				x = new NhanVien();
+			} else {
+				x = new KhachHang();
 			}
 			x.nhap(); // Da hinh: goi dung phuong thuc nhap() cua lop con
 			if (!kiemTraTrungMa(x.getMaDinhDanh(), boQuaViTri)) {
@@ -274,16 +268,11 @@ public class DanhSachNguoi implements IQuanLy {
 			return;
 		}
 
-		int demKH = 0, demNV = 0, demQL = 0;
+		int demKH = 0, demNV = 0;
 		long tongLuong = 0;
 
 		for (int i = 0; i < soluong; i++) {
-			if (ds[i] instanceof QuanLy) {
-				demQL++;
-				demNV++;
-				QuanLy ql = (QuanLy) ds[i];
-				tongLuong += ql.getLuong() + (long) ql.getPhuCapChucVu();
-			} else if (ds[i] instanceof NhanVien) {
+			if (ds[i] instanceof NhanVien) {
 				demNV++;
 				NhanVien nv = (NhanVien) ds[i];
 				tongLuong += nv.getLuong();
@@ -295,8 +284,8 @@ public class DanhSachNguoi implements IQuanLy {
 		System.out.println("\n========== THONG KE SO LIEU ==========");
 		System.out.println("- Tong so doi tuong dang quan ly: " + soluong);
 		System.out.println("- So luong Khach Hang: " + demKH);
-		System.out.println("- So luong Nhan Vien: " + demNV + " (Trong do co " + demQL + " quan ly)");
-		System.out.println("- Tong quy luong nhan vien/quan ly: " + tongLuong + " VND");
+		System.out.println("- So luong Nhan Vien: " + demNV);
+		System.out.println("- Tong quy luong nhan vien: " + tongLuong + " VND");
 		if (demNV > 0) {
 			System.out.println("- Luong trung binh/nhan vien: " + (tongLuong / demNV) + " VND");
 		}
@@ -339,17 +328,12 @@ public class DanhSachNguoi implements IQuanLy {
 			return;
 		}
 
-		try (BufferedWriter bw = new BufferedWriter(new FileWriter(tenFile))) {
+		try (BufferedWriter bw = new BufferedWriter(
+				new OutputStreamWriter(new FileOutputStream(tenFile), StandardCharsets.UTF_8))) {
 			for (int i = 0; i < soluong; i++) {
 				Nguoi x = ds[i];
 				if (x == null) continue;
-				if (x instanceof QuanLy) {
-					QuanLy ql = (QuanLy) x;
-					bw.write(String.format(Locale.US, "QUANLY;%s;%s;%s;%s;%s;%s;%d;%s;%.2f\n",
-							ql.gethoten(), ql.getCCCD(), ql.getSdt(), ql.getDiachi(),
-							ql.getManv(), ql.getChucvu(), ql.getLuong(),
-							ql.getPhongBQL(), ql.getPhuCapChucVu()));
-				} else if (x instanceof NhanVien) {
+				if (x instanceof NhanVien) {
 					NhanVien nv = (NhanVien) x;
 					bw.write(String.format("NHANVIEN;%s;%s;%s;%s;%s;%s;%d\n",
 							nv.gethoten(), nv.getCCCD(), nv.getSdt(), nv.getDiachi(),
@@ -395,7 +379,7 @@ public class DanhSachNguoi implements IQuanLy {
 		}
 		File f = new File(tenFile);
 		if (!f.exists()) {
-			File alt = new File("D:\\Documents\\java(lthdt)\\java(lthdt)\\TV1", tenFile);
+			File alt = new File("Module1_DoiTuongCoBan", tenFile);
 			if (alt.exists()) {
 				f = alt;
 			} else {
@@ -404,7 +388,8 @@ public class DanhSachNguoi implements IQuanLy {
 			}
 		}
 
-		try (BufferedReader br = new BufferedReader(new FileReader(f))) {
+		try (BufferedReader br = new BufferedReader(
+				new InputStreamReader(new FileInputStream(f), StandardCharsets.UTF_8))) {
 			String line;
 			int soDong = 0;
 			while ((line = br.readLine()) != null) {
@@ -436,19 +421,6 @@ public class DanhSachNguoi implements IQuanLy {
 							continue;
 						}
 						x = new NhanVien(parts[1], parts[2], parts[3], parts[4], parts[5], parts[6], luong);
-					} else if (loai.equalsIgnoreCase("QUANLY") && parts.length >= 10) {
-						if (!kiemTraDuLieuChungFile(parts, soDong)) continue;
-						if (!NhanVien.kiemTraMaNV(parts[5]) || parts[6].trim().isEmpty() || parts[8].trim().isEmpty()) {
-							ThongBao.inCanhBao("Dong " + soDong + ": Ma NV, chuc vu hoac phong BQL khong hop le, bo qua.");
-							continue;
-						}
-						int luong = Integer.parseInt(parts[7].trim());
-						double phuCap = Double.parseDouble(parts[9].trim());
-						if (luong < 0 || phuCap < 0) {
-							ThongBao.inCanhBao("Dong " + soDong + ": Luong hoac phu cap am, bo qua.");
-							continue;
-						}
-						x = new QuanLy(parts[1], parts[2], parts[3], parts[4], parts[5], parts[6], luong, parts[8], phuCap);
 					} else {
 						ThongBao.inCanhBao("Dong " + soDong + ": Dinh dang hoac loai doi tuong khong hop le.");
 					}
@@ -481,5 +453,81 @@ public class DanhSachNguoi implements IQuanLy {
 
 	public int getSoluong() {
 		return soluong;
+	}
+
+	public Nguoi[] getDanhSach() {
+		return (ds != null) ? Arrays.copyOf(ds, soluong) : new Nguoi[0];
+	}
+
+	public Nguoi timTheoMa(String ma) {
+		int viTri = timViTriTheoMa(ma);
+		return (viTri != -1) ? ds[viTri] : null;
+	}
+
+	public List<KhachHang> getDanhSachKhachHang() {
+		List<KhachHang> ketQua = new ArrayList<>();
+		if (ds == null) {
+			return ketQua;
+		}
+		for (int i = 0; i < soluong; i++) {
+			if (ds[i] instanceof KhachHang) {
+				ketQua.add((KhachHang) ds[i]);
+			}
+		}
+		return ketQua;
+	}
+
+	public KhachHang timKhachHangTheoCCCD(String cccd) {
+		Nguoi n = timTheoMa(cccd);
+		return (n instanceof KhachHang) ? (KhachHang) n : null;
+	}
+
+	public KhachHang timKhachHang(String tuKhoa) {
+		KhachHang theoCccd = timKhachHangTheoCCCD(tuKhoa);
+		if (theoCccd != null) {
+			return theoCccd;
+		}
+		if (tuKhoa == null || tuKhoa.trim().isEmpty()) {
+			return null;
+		}
+		try {
+			int stt = Integer.parseInt(tuKhoa.trim());
+			List<KhachHang> dsKhach = getDanhSachKhachHang();
+			if (stt >= 1 && stt <= dsKhach.size()) {
+				return dsKhach.get(stt - 1);
+			}
+		} catch (NumberFormatException ignored) {
+		}
+		return null;
+	}
+
+	public boolean themDoiTuong(Nguoi x) {
+		if (x == null || kiemTraTrungMa(x.getMaDinhDanh(), -1)) {
+			return false;
+		}
+		if (ds == null) {
+			ds = new Nguoi[1];
+			ds[0] = x;
+			soluong = 1;
+		} else {
+			ds = Arrays.copyOf(ds, soluong + 1);
+			ds[soluong] = x;
+			soluong++;
+		}
+		return true;
+	}
+
+	public boolean xoaDoiTuongTheoMa(String ma) {
+		int viTri = timViTriTheoMa(ma);
+		if (viTri == -1) {
+			return false;
+		}
+		for (int i = viTri; i < soluong - 1; i++) {
+			ds[i] = ds[i + 1];
+		}
+		ds[soluong - 1] = null;
+		soluong--;
+		ds = Arrays.copyOf(ds, soluong);
+		return true;
 	}
 }

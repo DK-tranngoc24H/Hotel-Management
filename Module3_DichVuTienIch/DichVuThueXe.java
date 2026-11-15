@@ -28,8 +28,4 @@ public class DichVuThueXe extends DichVu {
     public String toFileLine() {
         return "ThueXe" + SEP + maDV + SEP + tenDV + SEP + donGia + SEP + loaiPhuongTien + SEP + soNgayThue;
     }
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> 2c424b4259f2ca0ec5a2e8a0ce5700237fce3469

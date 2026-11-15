@@ -28,8 +28,4 @@ public class DichVuSpaGiaiTri extends DichVu {
     public String toFileLine() {
         return "SpaGiaiTri" + SEP + maDV + SEP + tenDV + SEP + donGia + SEP + loaiHoatDong + SEP + thoiGianSuDung;
     }
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> 2c424b4259f2ca0ec5a2e8a0ce5700237fce3469

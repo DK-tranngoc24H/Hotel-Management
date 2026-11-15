@@ -1,14 +1,9 @@
-# ==============================================================================================
-# BỘ DỮ LIỆU CHUẨN CHO MODULE 4 (ĐỒNG BỘ GIÁ PHÒNG VỚI MODULE 2 - phong.text)
-# Công thức giá phòng/đêm từ Module 2 (phong.tinhGiaPhong()):
-#   - Standard: giaCoBan + (coGiuongPhu ? 100,000 : 0)
-#   - VIP     : giaCoBan + phuThuView (Bien: 100,000 | Thanh pho: 50,000 | San vuon: 0) + phiDichVuDacBiet
-# Cấu trúc mỗi dòng (ngăn cách bằng dấu chấm phẩy ';'):
-# maPhieu;ngayDat;ngayNhan;ngayTra;hoten;CCCD;sdt;diachi;loaikhach;maPhong;loaiPhong;giaCoBan;thuocTinhPhong;phiDichVuDacBiet;dsDichVu(maDV:soLuong,...);giamGia;daThanhToan;loaiThanhToan;thongTinThanhToan
-# ==============================================================================================
-PDP01;01/12/2026;02/12/2026;05/12/2026;Nguyen Van An;012345678901;0901234567;Ha Noi;Thuong;P101;Standard;500000;false;0;DA01:2,NU01:2;50000;false;CHUA_TT;Chua thanh toan
-PDP02;03/12/2026;04/12/2026;08/12/2026;Tran Thi Bich;079987654321;0987654321;TP Ho Chi Minh;VIP;P201;VIP;1200000;Bien;200000;SG01:2,TX02:1;100000;true;CHUYEN_KHOAN;Vietcombank - GD982341
-PDP03;10/12/2026;11/12/2026;14/12/2026;Le Hoang Nam;048123456789;0912345678;Da Nang;Doanh nghiep;P102;Standard;550000;true;0;DA03:2,NU02:2;0;false;CHUA_TT;Chua thanh toan
-PDP04;15/12/2026;16/12/2026;19/12/2026;Pham Minh Tuan;036123456789;0934567890;Hai Phong;Thuong;P202;VIP;1000000;Thanh pho;150000;SG03:2,TX03:1;150000;true;THE_TIN_DUNG;Visa - Pham Minh Tuan
-PDP05;18/12/2026;19/12/2026;22/12/2026;Hoang Thuy Linh;001123456789;0945678901;Quang Ninh;VIP;P203;VIP;900000;San vuon;100000;DA05:1,NU03:2,SG02:2;50000;true;VI_DIEN_TU;MoMo - 0945678901
-PDP06;20/12/2026;21/12/2026;25/12/2026;Dang Quoc Huy;092123456789;0956789012;Can Tho;Doanh nghiep;P301;VIP;2000000;Bien;500000;DA04:4,SG01:2,TX04:1;200000;false;CHUA_TT;Chua thanh toan
+# maPhieu;ngayDat;ngayNhan;ngayTra;hoten;CCCD;sdt;diachi;loaikhach;maPhong;loaiPhong;giaCoBan;thuocTinhPhong;phiDichVuDacBiet;dsDichVu;giamGia;daThanhToan;trangThai;phuongThucThanhToan
+PDP01;01/12/2026;02/12/2026;05/12/2026;Nguyen Van An;012345678901;0901234567;Ha Noi;Thuong;P101;Standard;500000;false;0;DA01:2,NU01:2;0;false;DAT_MOI;Chua thanh toan
+PDP02;03/12/2026;04/12/2026;08/12/2026;Tran Thi Bich;079987654321;0987654321;TP Ho Chi Minh;VIP;P201;VIP;1200000;Bien;200000;SG01:2,TX02:1;100000;true;DA_TRA_PHONG;Vietcombank - GD982341
+PDP03;10/12/2026;11/12/2026;14/12/2026;Le Hoang Nam;048123456789;0912345678;Da Nang;Thuong;P102;Standard;550000;true;0;DA03:2,NU02:2;0;false;DAT_MOI;Chua thanh toan
+PDP04;15/12/2026;16/12/2026;19/12/2026;Pham Minh Tuan;036123456789;0934567890;Hai Phong;Thuong;P202;VIP;1000000;Thanh pho;150000;SG03:2,TX03:1;150000;true;DA_TRA_PHONG;Visa - Pham Minh Tuan
+PDP05;18/12/2026;19/12/2026;22/12/2026;Hoang Thuy Linh;001123456789;0945678901;Quang Ninh;VIP;P203;VIP;900000;San vuon;100000;DA05:1,NU03:2,SG02:2;50000;true;DA_TRA_PHONG;MoMo - 0945678901
+PDP06;20/12/2026;21/12/2026;25/12/2026;Dang Quoc Huy;092123456789;0956789012;Can Tho;VIP;P301;VIP;2000000;Bien;500000;DA04:4,SG01:2,TX04:1;0;false;DAT_MOI;Chua thanh toan
+125;01/02/2026;01/03/2026;01/04/2026;f;012346789888;0123456789;ddd;Thuong;P103;Standard;500000;false;0;NONE;0;true;DA_TRA_PHONG;tien mat
+188;01/02/2026;01/03/2026;01/04/2026;fff;012345678955;0123456789;m;VIP;P304;VIP;1350000;San vuon;200000;NONE;0;false;DANG_O;Chua thanh toan

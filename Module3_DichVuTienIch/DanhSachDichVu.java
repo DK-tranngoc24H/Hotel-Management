@@ -2,6 +2,7 @@ package BT_quanLyKhachSan;
 
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,15 +21,31 @@ public class DanhSachDichVu {
         return ds;
     }
 
+    // Tìm file dichvu.txt dù chạy từ thư mục gốc hay từ trong Module 3
+    private Path timFileDichVu() {
+        String[] cacDuongDan = {
+            "Module3_DichVuTienIch/" + TEN_FILE,
+            TEN_FILE
+        };
+        for (String p : cacDuongDan) {
+            Path path = Paths.get(p);
+            if (Files.exists(path)) {
+                return path;
+            }
+        }
+        return Paths.get("Module3_DichVuTienIch/" + TEN_FILE);
+    }
+
     // Đọc toàn bộ file, mỗi dòng thành một dịch vụ
     public void docFile() {
         ds.clear();
-        if (!Files.exists(Paths.get(TEN_FILE))) {
+        Path file = timFileDichVu();
+        if (!Files.exists(file)) {
             System.out.println("Chưa có file " + TEN_FILE + ", danh sách trống.");
             return;
         }
         try {
-            List<String> cacDong = Files.readAllLines(Paths.get(TEN_FILE), StandardCharsets.UTF_8);
+            List<String> cacDong = Files.readAllLines(file, StandardCharsets.UTF_8);
             for (String dong : cacDong) {
                 try {
                     DichVu dv = tachDong(dong);
@@ -51,7 +68,7 @@ public class DanhSachDichVu {
             cacDong.add(dv.toFileLine());
         }
         try {
-            Files.write(Paths.get(TEN_FILE), cacDong, StandardCharsets.UTF_8);
+            Files.write(timFileDichVu(), cacDong, StandardCharsets.UTF_8);
         } catch (Exception e) {
             System.out.println("Lỗi khi ghi file: " + e.getMessage());
         }
@@ -130,8 +147,4 @@ public class DanhSachDichVu {
     private String canPhai(String s, int w) {
         return " ".repeat(w - s.length()) + s;
     }
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> 2c424b4259f2ca0ec5a2e8a0ce5700237fce3469

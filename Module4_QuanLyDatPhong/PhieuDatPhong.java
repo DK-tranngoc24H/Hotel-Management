@@ -163,7 +163,7 @@ public class PhieuDatPhong implements INhapXuat {
         String CCCD = KiemTraLoi.nhapChuoiKhongRong(sc, "Nhap CCCD: ");
         String sdt = KiemTraLoi.nhapChuoiKhongRong(sc, "Nhap sdt: ");
         String diachi = KiemTraLoi.nhapChuoiKhongRong(sc, "Nhap Dia Chi: ");
-        String loaikhach = KiemTraLoi.nhapChuoiKhongRong(sc, "Nhap loai khach (Thuong / VIP / Doanh nghiep): ");
+        String loaikhach = KiemTraLoi.nhapChuoiKhongRong(sc, "Nhap loai khach (Thuong / VIP): ");
         this.khachHang = new KhachHang(hoten, CCCD, sdt, diachi, loaikhach, null);
 
         ThongBao.inTieuDe("Chon phong tu Module 2 (DanhSachPhong)");

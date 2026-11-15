@@ -252,8 +252,7 @@ public class HoaDon implements INhapXuat {
             System.out.println("  (Chua co thong tin khach hang)");
         }
 
-        System.out.println("
-[2] CHI TIET TIEN PHONG (Theo bang gia Module 2):");
+        System.out.println("\n[2] CHI TIET TIEN PHONG (Theo bang gia Module 2):");
         if (phieu != null) {
             Phong phong = phieu.getPhong();
             System.out.printf("  - Ma phong          : %s%n", phieu.getMaPhong());
@@ -285,8 +284,7 @@ public class HoaDon implements INhapXuat {
             System.out.printf("  - Tien phong        : %,.0f VND%n", tienPhong);
         }
 
-        System.out.println("
-[3] CHI TIET DICH VU PHU TRO (ChiTietHoaDon):");
+        System.out.println("\n[3] CHI TIET DICH VU PHU TRO (ChiTietHoaDon):");
         if (chiTiet != null && chiTiet.getSoLuongDichVu() > 0) {
             System.out.println("  ------------------------------------------------------------------------------------------------");
             System.out.printf("  | %-6s | %-26s | %-16s | %-12s | %-8s | %-15s |%n",
@@ -306,8 +304,7 @@ public class HoaDon implements INhapXuat {
             System.out.println("  (Khach hang khong su dung dich vu phu tro: 0 VND)");
         }
 
-        System.out.println("
-[4] TONG HOP THANH TOAN:");
+        System.out.println("\n[4] TONG HOP THANH TOAN:");
         System.out.println("==================================================================================================");
         System.out.printf("  1. Tien phong                    : %,15.0f VND%n", tienPhong);
         System.out.printf("  2. Tien dich vu phu thu          : %,15.0f VND%n", tienDichVu);

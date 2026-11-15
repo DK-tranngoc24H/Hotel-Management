@@ -1,9 +1,12 @@
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Scanner;
 
@@ -35,6 +38,17 @@ public class DanhSachPhong {
         }
     }
 
+    public void ghiFileMacDinh() {
+        String[] duongDan = { "Module2_QuanLyPhong/phong.text", "phong.text" };
+        for (String path : duongDan) {
+            if (new File(path).exists()) {
+                ghiFile(path);
+                return;
+            }
+        }
+        ghiFile("Module2_QuanLyPhong/phong.text");
+    }
+
     private void moRongMangNeuDay() {
         if (soLuong >= ds.length) {
             int kichThuocMoi = (ds.length == 0) ? KICH_THUOC_MAC_DINH : ds.length * 2;
@@ -42,7 +56,7 @@ public class DanhSachPhong {
         }
     }
 
-    private boolean them(Phong p) {
+    public boolean them(Phong p) {
         if (p == null || timViTriTheoMa(p.getMaPhong()) != -1) {
             return false;
         }
@@ -174,7 +188,8 @@ public class DanhSachPhong {
     }
 
     public void ghiFile(String tenFile) {
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter(tenFile))) {
+        try (BufferedWriter bw = new BufferedWriter(
+                new OutputStreamWriter(new FileOutputStream(tenFile), StandardCharsets.UTF_8))) {
             for (int i = 0; i < soLuong; i++) {
                 bw.write(ds[i].toFileString());
                 bw.newLine();
@@ -195,7 +210,8 @@ public class DanhSachPhong {
         Arrays.fill(ds, null);
         soLuong = 0;
 
-        try (BufferedReader br = new BufferedReader(new FileReader(f))) {
+        try (BufferedReader br = new BufferedReader(
+                new InputStreamReader(new FileInputStream(f), StandardCharsets.UTF_8))) {
             String line;
             while ((line = br.readLine()) != null) {
                 if (line.trim().isEmpty()) {

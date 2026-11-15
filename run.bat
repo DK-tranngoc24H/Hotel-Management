@@ -15,8 +15,9 @@ echo ==============================================
 echo   HOTEL MANAGEMENT - BIEN DICH VA KHOI DONG   
 echo ==============================================
 echo.
+if not exist out mkdir out
 echo [1/2] Dang bien dich cac module...
-%JAVAC_CMD% -encoding UTF-8 ClassDungChung\*.java Module1_DoiTuongCoBan\*.java Module2_QuanLyPhong\*.java Module3_DichVuTienIch\*.java Module4_QuanLyDatPhong\*.java Module5_Menu\*.java
+%JAVAC_CMD% -encoding UTF-8 -d out ClassDungChung\*.java Module1_DoiTuongCoBan\*.java Module2_QuanLyPhong\*.java Module3_DichVuTienIch\*.java Module4_QuanLyDatPhong\*.java Module5_Menu\*.java
 
 if %errorlevel% neq 0 (
     echo.
@@ -27,6 +28,6 @@ if %errorlevel% neq 0 (
 
 echo [2/2] Bien dich thanh cong! Dang khoi chay chuong trinh...
 echo.
-%JAVA_CMD% -cp "ClassDungChung;Module1_DoiTuongCoBan;Module2_QuanLyPhong;Module3_DichVuTienIch;Module4_QuanLyDatPhong;Module5_Menu;." Main
+%JAVA_CMD% -cp out Main
 pause
 

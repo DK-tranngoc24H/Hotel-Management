@@ -98,7 +98,7 @@ public class QuanLyDatPhong {
 
         KhachHang kh1 = new KhachHang("Nguyen Van An", "012345678901", "0901234567", "Ha Noi", "Thuong", null);
         KhachHang kh2 = new KhachHang("Tran Thi Bich", "079987654321", "0987654321", "TP Ho Chi Minh", "VIP", null);
-        KhachHang kh3 = new KhachHang("Le Hoang Nam", "048123456789", "0912345678", "Da Nang", "Doanh nghiep", null);
+        KhachHang kh3 = new KhachHang("Le Hoang Nam", "048123456789", "0912345678", "Da Nang", "Thuong", null);
         KhachHang kh4 = new KhachHang("Pham Minh Tuan", "036123456789", "0934567890", "Hai Phong", "Thuong", null);
 
         Phong p101 = dsPhongM2.timKiemTheoMaPhong("P101");
@@ -257,14 +257,10 @@ public class QuanLyDatPhong {
 
         try (BufferedWriter bw = new BufferedWriter(
                 new OutputStreamWriter(new FileOutputStream(f), StandardCharsets.UTF_8))) {
-            bw.write("# ==============================================================================================
-");
-            bw.write("# BỘ DỮ LIỆU CHUẨN CHO MODULE 4 (ĐỒNG BỘ GIÁ PHÒNG VỚI MODULE 2 - phong.text)
-");
-            bw.write("# Cấu trúc: maPhieu;ngayDat;ngayNhan;ngayTra;hoten;CCCD;sdt;diachi;loaikhach;maPhong;loaiPhong;giaCoBan;thuocTinhPhong;phiDichVuDacBiet;dsDichVu;giamGia;daThanhToan;loaiThanhToan;thongTinThanhToan
-");
-            bw.write("# ==============================================================================================
-");
+            bw.write("# ==============================================================================================\n");
+            bw.write("# BỘ DỮ LIỆU CHUẨN CHO MODULE 4 (ĐỒNG BỘ GIÁ PHÒNG VỚI MODULE 2 - phong.text)\n");
+            bw.write("# Cấu trúc: maPhieu;ngayDat;ngayNhan;ngayTra;hoten;CCCD;sdt;diachi;loaikhach;maPhong;loaiPhong;giaCoBan;thuocTinhPhong;phiDichVuDacBiet;dsDichVu;giamGia;daThanhToan;loaiThanhToan;thongTinThanhToan\n");
+            bw.write("# ==============================================================================================\n");
 
             for (PhieuDatPhong p : dsPhieu) {
                 KhachHang khachHang = p.getKhachHang();
@@ -308,8 +304,7 @@ public class QuanLyDatPhong {
                         sbDV.toString(), giamGia, daThanhToan,
                         (daThanhToan ? "DA_TT" : "CHUA_TT"),
                         (daThanhToan ? "Da thanh toan" : "Chua thanh toan"));
-                bw.write(line + "
-");
+                bw.write(line + "\n");
             }
             ThongBao.inThanhCong("Đã lưu thành công " + dsPhieu.size() + " bản ghi vào file: " + f.getPath());
         } catch (IOException e) {
