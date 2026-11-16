@@ -1,6 +1,6 @@
 import java.util.Scanner;
 
-public abstract class Nguoi {
+public  class Nguoi {
     Scanner sc = new Scanner(System.in);
     protected String hoten;
     protected String CCCD;
