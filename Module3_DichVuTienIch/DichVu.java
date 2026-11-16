@@ -1,4 +1,3 @@
-package BT_quanLyKhachSan;
 
 public abstract class DichVu {
     // Ký tự ngăn cách các cột trong file dữ liệu

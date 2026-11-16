@@ -1,10 +1,5 @@
 import java.util.ArrayList;
 import java.util.Scanner;
-import BT_quanLyKhachSan.DanhSachDichVu;
-import BT_quanLyKhachSan.DichVu;
-import BT_quanLyKhachSan.DichVuAnUong;
-import BT_quanLyKhachSan.DichVuSpaGiaiTri;
-import BT_quanLyKhachSan.DichVuThueXe;
 
 /**
  * Lớp ChiTietHoaDon – quản lý danh sách các dịch vụ mà khách đã sử dụng.

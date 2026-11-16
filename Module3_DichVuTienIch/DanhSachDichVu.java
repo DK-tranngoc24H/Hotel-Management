@@ -1,4 +1,3 @@
-package BT_quanLyKhachSan;
 
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;

@@ -1,10 +1,6 @@
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Scanner;
-import BT_quanLyKhachSan.DanhSachDichVu;
-import BT_quanLyKhachSan.DichVu;
-import BT_quanLyKhachSan.NhapLieu;
-import BT_quanLyKhachSan.QuanLyDichVu;
 
 public class Main {
     private static final String MAT_KHAU_NHAN_VIEN = "nv123";

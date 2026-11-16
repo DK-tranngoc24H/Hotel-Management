@@ -1,4 +1,3 @@
-package BT_quanLyKhachSan;
 
 public class QuanLyDichVu {
     private final DanhSachDichVu dsDV;

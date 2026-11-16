@@ -1,6 +1,5 @@
 import java.time.LocalDate;
 import java.util.Scanner;
-import BT_quanLyKhachSan.DichVu;
 
 /**
  * Lớp HoaDon – tính toán và hiển thị hóa đơn thanh toán toàn diện của khách hàng.

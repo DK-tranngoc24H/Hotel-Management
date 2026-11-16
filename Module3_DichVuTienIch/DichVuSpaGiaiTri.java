@@ -1,4 +1,3 @@
-package BT_quanLyKhachSan;
 
 public class DichVuSpaGiaiTri extends DichVu {
     private String loaiHoatDong;   // Massage, Hồ bơi, Karaoke, ...

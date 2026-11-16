@@ -1,4 +1,3 @@
-package BT_quanLyKhachSan;
 
 public class DichVuThueXe extends DichVu {
     private String loaiPhuongTien;   // Xe máy, Ô tô 4 chỗ, ...

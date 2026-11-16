@@ -1,4 +1,3 @@
-package BT_quanLyKhachSan;
 
 public class DichVuAnUong extends DichVu {
     private String phanLoai;   // Đồ ăn / Đồ uống
