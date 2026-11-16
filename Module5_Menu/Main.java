@@ -433,8 +433,7 @@ public class Main {
     }
 
     private void taoPhieu(Scanner sc) {
-        System.out.println("\n--- TAO PHIEU
-                                 DAT PHONG ---");
+        System.out.println("\n--- TAO PHIEU DAT PHONG ---");
         boolean coPhongTrong = false;
         for (Phong p : qlPhong.getDanhSach()) {
             if (p.conTrong()) {
@@ -516,11 +515,10 @@ public class Main {
 
     private void themDichVuChoKhach(Scanner sc) {
         String maPhieu = KiemTraLoi.nhapChuoiKhongRong(sc, "Ma phieu: ");
-        BanGhiLichSu banGhi = qlLichSu.timTheoMaPhieu(maPhieu)
+        BanGhiLichSu banGhi = qlLichSu.timTheoMaPhieu(maPhieu);
                         
         if (banGhi == null) {
-            System.out.println("-> Loi: Khong tim thay phieu dat phong '" + maPhieu + "'
-                        ");
+            System.out.println("-> Loi: Khong tim thay phieu dat phong '" + maPhieu + "'.");
             return;
         }
         if (banGhi.getTrangThai() == TrangThai.DA_HUY || banGhi.getTrangThai() == TrangThai.DA_TRA_PHONG) {
@@ -600,8 +598,7 @@ public class Main {
                     
                     break;
                 case 5:
-                    dsDV.g
-                        hiFile();
+                    dsDV.ghiFile();
                     System.out.println("-> Da luu danh sach dich vu ra file dichvu.txt.");
                     break;
                 case 0:
@@ -659,8 +656,7 @@ public class Main {
 
     private String nhapHoTenHopLe(Scanner sc) {
         while (true) {
-            String hoTen = Kiem
-                    TraLoi.nhapChuoiKhongRong(sc, "Ho ten: ");
+            String hoTen = KiemTraLoi.nhapChuoiKhongRong(sc, "Ho ten: ");
             if (Nguoi.kiemTraHoTen(hoTen)) {
                 return hoTen;
             }
@@ -681,7 +677,7 @@ public class Main {
     }
 
     private String nhapSDTHopLe(Scanner sc) {
-        while (true)  
+        while (true) {
             
             String sdt = KiemTraLoi.nhapChuoiKhongRong(sc, "So dien thoai (10 chu so, bat dau bang 0): ");
             if (Nguoi.kiemTraSDT(sdt)) {
